@@ -29,12 +29,13 @@ h2 { color:#9be7ff; font-size:28px; }
 .status {
   margin:25px auto;
   padding:25px;
-  font-size:24px;
+  font-size:22px;
   font-weight:900;
   border-radius:20px;
+  white-space:pre-line;
 }
-.ok { background:#2ecc71; }
-.err { background:#e74c3c; }
+.ok   { background:#2ecc71; }
+.err  { background:#e74c3c; }
 .wait { background:#f1c40f; color:black; }
 
 button {
@@ -59,8 +60,9 @@ button {
 <div id="status" class="status">請啟動相機</div>
 
 <script>
+// ✅ 換成你真正的 GAS Web App
 const API_URL =
-  "https://script.google.com/macros/s/✅你的GAS部署ID✅/exec";
+  "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let qr;
 let scanning = false;
@@ -73,8 +75,8 @@ document.getElementById("start").onclick = () => {
     { fps: 15, qrbox: 250 },
     onScan
   );
-  statusEl.className="status wait";
-  statusEl.innerText="📷 相機啟動中…";
+  statusEl.className = "status wait";
+  statusEl.innerText = "📷 相機啟動中…";
 };
 
 function onScan(text) {
@@ -87,19 +89,42 @@ function onScan(text) {
     : text;
 
   fetch(API_URL, {
-    method:"POST",
+    method: "POST",
     body: JSON.stringify({ id })
   })
-  .then(r=>r.text())
-  .then(msg=>{
-    statusEl.className = msg.includes("🟢") ? "status ok" : "status err";
-    statusEl.innerText = msg;
-    scanning=false;
-    setTimeout(()=>qr.start(
-      { facingMode: "environment" },
-      { fps:15, qrbox:250 },
-      onScan
-    ), 2500);
+  .then(r => r.json())   // ✅ 改成接 JSON
+  .then(res => {
+    if (!res.ok) {
+      statusEl.className = "status err";
+      statusEl.innerText = res.msg;
+    } else {
+      const d = res.detail;
+      statusEl.className = "status ok";
+      statusEl.innerText =
+`✅ ${res.msg}
+
+🎫 全票：${d.cash_full + d.card_full}
+👥 團體：${d.cash_group + d.card_group}
+🧓 優待：${d.cash_discount + d.card_discount}
+🆓 免費：${d.free}
+👤 總人數：${d.people}`;
+    }
+
+    scanning = false;
+    setTimeout(() => {
+      statusEl.className = "status wait";
+      statusEl.innerText = "🟢 請掃描下一張票";
+      qr.start(
+        { facingMode:"environment" },
+        { fps:15, qrbox:250 },
+        onScan
+      );
+    }, 3000);
+  })
+  .catch(() => {
+    statusEl.className = "status err";
+    statusEl.innerText = "❌ 系統連線失敗";
+    scanning = false;
   });
 }
 </script>

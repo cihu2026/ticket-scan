@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>後慈湖驗票</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body {
+  font-family: "Noto Sans TC", sans-serif;
+  background:#121212;
+  color:white;
+  text-align:center;
+  padding:15px;
+}
+h2 { color:#9be7ff; font-size:28px; }
+
+#reader {
+  max-width:600px;
+  margin:10px auto;
+  border-radius:25px;
+  overflow:hidden;
+  border:4px solid #444;
+  background:#000;
+}
+.status {
+  margin:25px auto;
+  padding:25px;
+  font-size:24px;
+  font-weight:900;
+  border-radius:20px;
+}
+.ok { background:#2ecc71; }
+.err { background:#e74c3c; }
+.wait { background:#f1c40f; color:black; }
+
+button {
+  width:90%;
+  max-width:500px;
+  padding:25px;
+  font-size:26px;
+  border-radius:60px;
+  border:none;
+  background:linear-gradient(135deg,#3498db,#2980b9);
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🎟️ 後慈湖驗票系統</h2>
+
+<div id="reader"></div>
+<button id="start">📷 啟動相機驗票</button>
+<div id="status" class="status">請啟動相機</div>
+
+<script>
+const API_URL =
+  "https://script.google.com/macros/s/✅你的GAS部署ID✅/exec";
+
+let qr;
+let scanning = false;
+const statusEl = document.getElementById("status");
+
+document.getElementById("start").onclick = () => {
+  qr = new Html5Qrcode("reader");
+  qr.start(
+    { facingMode: "environment" },
+    { fps: 15, qrbox: 250 },
+    onScan
+  );
+  statusEl.className="status wait";
+  statusEl.innerText="📷 相機啟動中…";
+};
+
+function onScan(text) {
+  if (scanning) return;
+  scanning = true;
+  qr.stop();
+
+  const id = text.includes("id=")
+    ? text.split("id=")[1].split("&")[0]
+    : text;
+
+  fetch(API_URL, {
+    method:"POST",
+    body: JSON.stringify({ id })
+  })
+  .then(r=>r.text())
+  .then(msg=>{
+    statusEl.className = msg.includes("🟢") ? "status ok" : "status err";
+    statusEl.innerText = msg;
+    scanning=false;
+    setTimeout(()=>qr.start(
+      { facingMode: "environment" },
+      { fps:15, qrbox:250 },
+      onScan
+    ), 2500);
+  });
+}
+</script>
+
+</body>
+</html>

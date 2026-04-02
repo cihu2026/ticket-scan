@@ -127,6 +127,17 @@ function onScan(text) {
     scanning = false;
   });
 }
+// 🎫 驗票成功時自動呼叫
+fetch("你的GAS網址", {
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify({ 
+    type: "IN", 
+    delta: 1, 
+    source: "驗票槍掃描" 
+  })
+});
+
 </script>
 
 </body>

@@ -107,20 +107,21 @@ document.getElementById("start").onclick = () => {
 function onScan(text) {
   if (scanning) return;
   scanning = true;
-  qr.stop();
+  // 這裡建議不要 qr.stop()，除非你想掃完一個就重啟相機
+  // 如果想連續掃描，可以用計時器隔開
 
   // ✅ 正確解析票號
-const id = text.includes("id=")
-  ? text.split("id=")[1].split("&")[0]
-  : text;
+  const id = text.includes("id=")
+    ? text.split("id=")[1].split("&")[0]
+    : text;
 
   lastTicketId = id;
   adjusted = false;
 
-  // 驗票
+  // 1. 執行驗票與核銷
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ id: id }) // 傳送票號給整合後的 doPost
   })
   .then(r => r.json())
   .then(res => {
@@ -133,34 +134,25 @@ const id = text.includes("id=")
 
     const d = res.detail;
 
+    // 顯示票券資訊
     statusEl.className = "status ok";
-    statusEl.innerText =
-`✅ 驗票成功
+    statusEl.innerText = 
+`✅ 驗票成功！已自動入園
 
-🎫 現金全票：${d.cash_full}
-👥 現金團體：${d.cash_group}
-🧓 現金優待：${d.cash_discount}
-💳 悠遊全票：${d.card_full}
-💳 悠遊團體：${d.card_group}
-💳 悠遊優待：${d.card_discount}
-🆓 免費：${d.free}
-👤 本票總人數：${d.people}`;
+👤 本票總人數：${d.people}
+🎫 現金全/團/優：${d.cash_full}/${d.cash_group}/${d.cash_discount}
+💳 悠遊全/團/優：${d.card_full}/${d.card_group}/${d.card_discount}
+🆓 免費：${d.free}`;
 
-    // ✅ 依票內人數進園
-    fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        mode: "IN",
-        delta: d.people,
-        source: "SCAN_IN",
-        note: "qr=" + id
-      })
-    });
+    // 💡 註：因為 Code.gs 已經在核銷成功時自動幫你加了 IN，
+    // 所以這裡不需要再發送第二次 fetch，避免人數重複計算。
 
     adjustArea.style.display = "block";
-    scanning = false;
+    
+    // 3秒後允許再次掃描
+    setTimeout(() => { scanning = false; }, 3000);
   })
-  .catch(() => {
+  .catch((err) => {
     statusEl.className = "status err";
     statusEl.innerText = "❌ 系統連線失敗";
     scanning = false;
@@ -174,23 +166,24 @@ function adjust(diff) {
     return;
   }
 
-  if (!confirm(`確認手動調整 ${diff > 0 ? "+" : ""}${diff} 人？`)) return;
+  if (!confirm(`確認手動微調人數 ${diff > 0 ? "+" : ""}${diff} 人？`)) return;
 
+  // 這裡要傳送 type: "IN"，這樣才會累加進「入園人數」
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({
-      mode: "IN",
+      type: "IN", 
       delta: diff,
-      source: "SCAN_ADJUST",
-      note: "manual_adjust qr=" + lastTicketId
+      source: "驗票端微調",
+      note: "票號:" + lastTicketId
     })
+  })
+  .then(() => {
+    adjusted = true;
+    adjustArea.style.display = "none";
+    alert("✅ 人數微調已同步至試算表");
   });
-
-  adjusted = true;
-  adjustArea.style.display = "none";
-  alert("✅ 已完成手動調整");
 }
-</script>
 
 </body>
 </html>

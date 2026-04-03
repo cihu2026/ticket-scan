@@ -110,9 +110,9 @@ function onScan(text) {
   qr.stop();
 
   // ✅ 正確解析票號
-  const id = text.includes("id=")
-    ? text.split("id=")[1].split("&")[0]
-    : text;
+const id = text.includes("id=")
+  ? text.split("id=")[1].split("&")[0]
+  : text;
 
   lastTicketId = id;
   adjusted = false;

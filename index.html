@@ -30,15 +30,133 @@
 <button id="start">📷 啟動相機驗票</button>
 <div id="status" class="status">請啟動相機</div>
 
-<div id="adjustArea">
-  <div style="margin-bottom:8px;color:#ccc;">🔧 實際進園人數微調（僅限一次）</div>
-  <button onclick="adjust(-1)">-1</button>
-  <button onclick="adjust(1)">+1</button>
-  <button onclick="adjust(-2)">-2</button>
-  <button onclick="adjust(2)">+2</button>
+<div id="adjustArea" style="display:none; margin-top:15px; background: #222; padding: 15px; border-radius: 15px;">
+  <div style="margin-bottom:8px;color:#ccc;">🔧 實際人數微調 (補入或扣除)</div>
+  
+  <div style="margin-bottom: 10px;">
+    <button onclick="adjust(-1)" style="width:22%; font-size:16px; padding:10px 0;">-1</button>
+    <button onclick="adjust(1)" style="width:22%; font-size:16px; padding:10px 0;">+1</button>
+    <button onclick="adjust(-5)" style="width:22%; font-size:16px; padding:10px 0;">-5</button>
+    <button onclick="adjust(5)" style="width:22%; font-size:16px; padding:10px 0;">+5</button>
+  </div>
+
+  <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
+    <input type="number" id="manualDiff" placeholder="輸入數字(如 12 或 -8)" 
+           style="width: 60%; padding: 12px; border-radius: 10px; border: none; font-size: 18px; text-align: center;">
+    <button onclick="handleManualAdjust()" 
+            style="width: 30%; padding: 12px; font-size: 16px; background: #e67e22; border-radius: 10px;">送出</button>
+  </div>
+  <p style="font-size: 12px; color: #888; margin-top: 8px;">* 正數為增加，負數為減少</p>
 </div>
 
 <script>
+const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
+
+let html5QrCode;
+let scanning = false;
+let lastTicketId = "";
+// 注意：為了讓你多次微調，我們移除 adjusted = true 的鎖定
+const statusEl = document.getElementById("status");
+const adjustArea = document.getElementById("adjustArea");
+
+document.getElementById("start").onclick = () => {
+  if (html5QrCode) {
+    html5QrCode.stop().then(() => startCamera());
+  } else {
+    startCamera();
+  }
+};
+
+function startCamera() {
+  html5QrCode = new Html5Qrcode("reader");
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    onScan
+  ).catch(err => {
+    statusEl.className = "status err";
+    statusEl.innerText = "❌ 無法啟動相機";
+  });
+  statusEl.className = "status wait";
+  statusEl.innerText = "📷 相機掃描中...";
+  document.getElementById("start").style.display = "none";
+}
+
+function onScan(text) {
+  if (scanning) return;
+  scanning = true;
+
+  const id = text.includes("id=") ? text.split("id=")[1].split("&")[0] : text;
+  lastTicketId = id;
+  adjustArea.style.display = "none";
+
+  statusEl.className = "status wait";
+  statusEl.innerText = "⏳ 正在驗票中...";
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ id: id })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (!res.ok) {
+      statusEl.className = "status err";
+      statusEl.innerText = res.msg;
+      setTimeout(() => { scanning = false; statusEl.innerText = "📷 繼續掃描..."; }, 2000);
+      return;
+    }
+
+    const d = res.detail;
+    statusEl.className = "status ok";
+    statusEl.innerText = `✅ 驗票成功！已自動入園\n👤 票面總人數：${d.people}\n(場內目前：${res.current || '?'} 人)`;
+
+    adjustArea.style.display = "block";
+    
+    // 這裡我們把時間拉長，或者不自動重置掃描狀態，除非使用者點擊「繼續掃描」
+    // 如果想要馬上能掃下一個，可維持 5000，但現在我們多給微調的時間
+    setTimeout(() => { 
+      scanning = false; 
+    }, 2000); 
+  })
+  .catch((err) => {
+    statusEl.className = "status err";
+    statusEl.innerText = "❌ 網路連線失敗";
+    scanning = false;
+  });
+}
+
+// 處理手動輸入數值
+function handleManualAdjust() {
+  const input = document.getElementById("manualDiff");
+  const val = parseInt(input.value);
+  if (isNaN(val) || val === 0) return alert("請輸入有效的數字");
+  adjust(val);
+  input.value = ""; // 清空輸入框
+}
+
+// 通用微調函式
+function adjust(diff) {
+  // 移除「僅限一次」的鎖定，方便大團體分批修正
+  statusEl.innerText = "⏳ 正在同步人數...";
+  
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      type: "IN", 
+      delta: diff,
+      source: "驗票端微調",
+      note: "票號:" + lastTicketId
+    })
+  })
+  .then(r => r.json())
+  .then(res => {
+    statusEl.className = "status ok";
+    statusEl.innerText = `✅ 已更新人數\n微調幅度: ${diff > 0 ? "+" : ""}${diff}\n(目前場內：${res.current || '?'} 人)`;
+    // 保持微調區域顯示，讓使用者可以再次微調
+  })
+  .catch(() => alert("同步失敗，請檢查網路"));
+}
+</script>
 // ⚠️ 請確保此 URL 與你最新部署的 GAS 網址一致
 const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 

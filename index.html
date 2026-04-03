@@ -16,46 +16,49 @@
     --success: #2ecc71;
     --error: #e74c3c;
     --warning: #f1c40f;
+    --text-main: #e0e0e0;
+    --text-sub: #b0b0b0;
   }
 
   body { 
     font-family: "Noto Sans TC", sans-serif; 
     background: var(--bg-color); 
-    color: #e0e0e0; 
+    color: var(--text-main); 
     text-align: center; 
     padding: 15px; 
     margin: 0;
+    overflow-x: hidden;
   }
 
   h2 { 
     color: var(--primary); 
-    font-size: 26px; 
+    font-size: 24px; 
     font-weight: 900; 
-    margin-top: 20px;
+    margin-top: 15px;
     letter-spacing: 1px;
-    text-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
   }
 
-  /* 掃描框美化 */
+  /* 掃描框精緻化 */
   #reader { 
     max-width: 500px; 
-    margin: 20px auto; 
-    border-radius: 30px; 
+    margin: 15px auto; 
+    border-radius: 25px; 
     overflow: hidden; 
-    border: 3px solid #333; 
+    border: 2px solid #333; 
     background: #000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   }
 
-  /* 狀態卡片 */
+  /* 狀態卡片修正與美化 */
   .status { 
     max-width: 500px;
-    margin: 20px auto; 
-    padding: 25px; 
-    font-size: 17px; 
-    font-weight: 700; 
-    border-radius: 25px; 
-    white-space: pre-line; 
+    margin: 15px auto; 
+    padding: 20px; 
+    font-size: 16px; 
+    font-weight: 500; 
+    border-radius: 20px; 
+    white-space: pre-wrap; /* 修正換行問題 */
     min-height: 80px; 
     line-height: 1.6;
     transition: all 0.3s ease;
@@ -65,101 +68,161 @@
   }
 
   .ok { 
-    background: rgba(46, 204, 113, 0.15); 
-    border: 2px solid var(--success);
+    background: rgba(46, 204, 113, 0.1); 
+    border: 2px solid rgba(46, 204, 113, 0.5);
     color: #fff;
     text-align: left; 
-    box-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
   }
 
   .err { 
-    background: rgba(231, 76, 60, 0.15); 
-    border: 2px solid var(--error);
+    background: rgba(231, 76, 60, 0.1); 
+    border: 2px solid rgba(231, 76, 60, 0.5);
     color: #ff8a80;
-    box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.1);
   }
 
   .wait { 
-    background: rgba(241, 196, 15, 0.1); 
-    border: 2px solid var(--warning);
+    background: rgba(241, 196, 15, 0.05); 
+    border: 2px solid rgba(241, 196, 15, 0.4);
     color: var(--warning);
   }
 
-  /* 按鈕樣式 */
+  /* 按鈕樣式精緻化 */
   button { 
     width: 90%; 
     max-width: 500px; 
-    padding: 18px; 
-    font-size: 19px; 
+    padding: 16px; 
+    font-size: 18px; 
     font-weight: 700;
-    margin: 10px 0; 
+    margin: 8px 0; 
     border-radius: 50px; 
     border: none; 
     background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); 
     color: white; 
     cursor: pointer; 
-    box-shadow: 0 6px 15px rgba(0, 210, 255, 0.2);
-    transition: transform 0.1s;
+    box-shadow: 0 5px 12px rgba(0, 210, 255, 0.15);
+    transition: all 0.2s ease;
   }
-  button:active { transform: scale(0.96); }
+  button:active { transform: scale(0.97); }
 
-  /* 微調區域 */
+  /* 微調區域修正 */
   #adjustArea { 
     display: none; 
     max-width: 500px;
-    margin: 20px auto; 
+    margin: 15px auto; 
     background: var(--card-bg); 
-    padding: 20px; 
-    border-radius: 25px; 
+    padding: 18px; 
+    border-radius: 20px; 
     border: 1px solid #333;
   }
 
   .adj-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   .btn-small {
     width: 100%;
-    font-size: 16px;
-    padding: 12px 0;
-    background: #444;
-    border-radius: 15px;
+    font-size: 15px;
+    padding: 10px 0;
+    background: #333;
+    border-radius: 12px;
     margin: 0;
   }
 
-  .btn-plus { background: #2d5a27 !important; color: #a5d6a7; }
-  .btn-minus { background: #5a2727 !important; color: #ef9a9a; }
+  .btn-plus { background: rgba(45, 90, 39, 0.6) !important; color: #a5d6a7; border: 1px solid rgba(46, 204, 113, 0.3); }
+  .btn-minus { background: rgba(90, 39, 39, 0.6) !important; color: #ef9a9a; border: 1px solid rgba(231, 76, 60, 0.3); }
 
-  /* 輸入框 */
+  /* 輸入框精緻化 */
   .input-group {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
   }
 
   input[type="number"] { 
     flex: 1;
-    padding: 15px; 
-    border-radius: 15px; 
-    border: 2px solid #444; 
-    font-size: 18px; 
+    padding: 12px; 
+    border-radius: 12px; 
+    border: 2px solid #333; 
+    font-size: 16px; 
     background: #121212;
     color: white;
     text-align: center;
+    transition: border-color 0.2s;
   }
+  input[type="number"]:focus { border-color: var(--primary); outline: none; }
 
   .btn-send {
     flex: 0.5;
-    background: #e67e22;
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     margin: 0;
-    border-radius: 15px;
-    font-size: 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    box-shadow: 0 4px 10px rgba(230, 126, 34, 0.2);
   }
 
-  hr { border: 0; border-top: 1px dashed #444; margin: 15px 0; }
+  /* 💎 核心修正：將 HTML 解析移出 JS，用 CSS 排版 */
+  .detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .detail-header {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-sub);
+  }
+
+  .detail-icon {
+    font-size: 1.1em;
+    width: 20px;
+    text-align: center;
+  }
+
+  .detail-info {
+    flex: 1;
+  }
+
+  .ticket-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 15px;
+    font-size: 0.9em;
+    padding-left: 5px;
+  }
+
+  .total-count {
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* 水平線修正 */
+  .hr-line { 
+    border: 0; 
+    border-top: 1px dashed #444; 
+    margin: 12px 0; 
+    width: 100%;
+  }
+
+  /* 目前人數樣式修正 */
+  .current-status-row {
+    font-size: 1.1em;
+    color: #fff;
+    font-weight: 700;
+    padding-top: 5px;
+  }
 </style>
 </head>
 
@@ -172,12 +235,12 @@
 <div id="status" class="status">👋 您好！請點擊上方按鈕啟動掃描器</div>
 
 <div id="adjustArea">
-  <div style="margin-bottom:12px; font-weight:700; color:var(--primary);">🔧 進園人數手動微調</div>
+  <div style="margin-bottom:10px; font-weight:700; color:var(--primary);">🔧 進園人數手動微調</div>
   <div class="adj-grid">
-    <button class="btn-small btn-minus" onclick="adjust(-1)">-1</button>
-    <button class="btn-small btn-plus" onclick="adjust(1)">+1</button>
-    <button class="btn-small btn-minus" onclick="adjust(-5)">-5</button>
-    <button class="btn-small btn-plus" onclick="adjust(5)">+5</button>
+    <button class="btn-small btn-minus" onclick="adjust(-1)">-1👤</button>
+    <button class="btn-small btn-plus" onclick="adjust(1)">+1👤</button>
+    <button class="btn-small btn-minus" onclick="adjust(-5)">-5👤</button>
+    <button class="btn-small btn-plus" onclick="adjust(5)">+5👤</button>
   </div>
 
   <div class="input-group">
@@ -187,7 +250,7 @@
 </div>
 
 <script>
-// --- 這裡開始是你的 JS 邏輯 (保持不變) ---
+// --- JS 邏輯修正部分 ---
 const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let html5QrCode;
@@ -228,6 +291,7 @@ function onScan(text) {
   lastTicketId = id;
   
   statusEl.className = "status wait";
+  // 💎 核心修正：等待狀態也用純文字
   statusEl.innerText = "⏳ 正在驗證票券資料...";
 
   fetch(API_URL, {
@@ -238,30 +302,65 @@ function onScan(text) {
   .then(res => {
     if (!res.ok) {
       statusEl.className = "status err";
-      statusEl.innerText = "🚫 驗票失敗\n" + res.msg;
+      statusEl.innerText = "🚫 驗票失敗\n\n" + res.msg;
       setTimeout(() => { scanning = false; }, 2500);
       return;
     }
 
     const d = res.detail;
     statusEl.className = "status ok";
-    statusEl.innerText = 
-`✅ 驗票成功！歡迎入園
-
-👥 總入園人數：${d.people} 人
-<hr>
-🔸 現金：全${d.cash_full} / 團${d.cash_group} / 優${d.cash_discount}
-🔸 悠遊：全${d.card_full} / 團${d.card_group} / 優${d.card_discount}
-🔸 免費：${d.free} 人
-<hr>
-📊 當前場內總人數：${res.current || '?'} 人`;
+    
+    // 💎 核心修正：使用 HTML 結構來排版，避開在 JS 裡寫代碼
+    // 先清空原本內容
+    statusEl.innerHTML = "";
+    
+    const detailHTML = `
+      <div class="detail-block">
+        <div class="detail-header">✅ 驗票成功！歡迎入園</div>
+        <div class="detail-row">
+          <span class="detail-icon">👥</span>
+          <div class="detail-info">總入園人數：<span class="total-count">${d.people}</span> 人</div>
+        </div>
+        
+        <div class="hr-line"></div>
+        
+        <div class="detail-row">
+          <span class="detail-icon">🔸</span>
+          <div class="detail-info">
+            <div>現金</div>
+            <div class="ticket-list"><span>全 ${d.cash_full}</span> / <span>團 ${d.cash_group}</span> / <span>優 ${d.cash_discount}</span></div>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-icon">🔸</span>
+          <div class="detail-info">
+            <div>悠遊卡</div>
+            <div class="ticket-list"><span>全 ${d.card_full}</span> / <span>團 ${d.card_group}</span> / <span>優 ${d.card_discount}</span></div>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-icon">🔸</span>
+          <div class="detail-info">免費入園：${d.free} 人</div>
+        </div>
+        
+        <div class="hr-line"></div>
+        
+        <div class="current-status-row">
+          📊 當前場內總人數：${res.current || '?'} 人
+        </div>
+      </div>
+    `;
+    
+    statusEl.innerHTML = detailHTML;
 
     adjustArea.style.display = "block";
     setTimeout(() => { scanning = false; }, 3000);
   })
-  .catch(() => {
+  .catch((e) => {
     statusEl.className = "status err";
-    statusEl.innerText = "🌐 網路連線異常，請重新嘗試";
+    statusEl.innerText = "🌐 網路連線異常，請重新嘗試\n\n(Error: " + e.message + ")";
     scanning = false;
   });
 }
@@ -289,8 +388,20 @@ function adjust(diff) {
   })
   .then(r => r.json())
   .then(res => {
+    // 💎 核心修正：修正成功也改用內置樣式，避開 innerText 的格式問題
     statusEl.className = "status ok";
-    statusEl.innerText = `✅ 人數已修正成功 (${diff > 0 ? "+" : ""}${diff})\n\n📊 目前場內總人數：${res.current || '?'} 人`;
+    statusEl.innerHTML = `
+      <div style="text-align: center;">
+        <div class="detail-header">✅ 人數修正成功</div>
+        <div style="font-size: 1.2em; color: ${diff > 0 ? var(--success) : var(--error)}; font-weight: 700;">
+          已${diff > 0 ? "增加" : "減少"} ${Math.abs(diff)}👤
+        </div>
+        <div class="hr-line"></div>
+        <div class="current-status-row">
+          📊 當前場內總人數：${res.current || '?'} 人
+        </div>
+      </div>
+    `;
   })
   .catch(() => alert("❌ 同步失敗"));
 }

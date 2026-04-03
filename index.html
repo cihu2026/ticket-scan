@@ -51,7 +51,6 @@ button {
   color:white;
 }
 
-/* 手動調整區 */
 #adjustArea {
   display:none;
   margin-top:15px;
@@ -71,7 +70,7 @@ button {
 <div id="status" class="status">請啟動相機</div>
 
 <div id="adjustArea">
-  <div style="margin-bottom:8px;color:#ccc;">🔧 實際進園人數微調</div>
+  <div style="margin-bottom:8px;color:#ccc;">🔧 實際進園人數微調（僅限一次）</div>
   <button onclick="adjust(-1)">-1</button>
   <button onclick="adjust(1)">+1</button>
   <button onclick="adjust(-2)">-2</button>
@@ -79,13 +78,14 @@ button {
 </div>
 
 <script>
-// ✅ 統一後端 GAS（mode: IN）
+// ✅ 統一後端 GAS
 const API_URL =
   "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let qr;
 let scanning = false;
 let lastTicketId = "";
+let adjusted = false; // ✅ 本票是否已微調
 const statusEl = document.getElementById("status");
 const adjustArea = document.getElementById("adjustArea");
 
@@ -107,15 +107,15 @@ function onScan(text) {
   qr.stop();
 
   const id = text.includes("id=")
-    ? text.split("id=")[1].split("&")[0]
+    ? text.split("id=")[1].split("&")[0]   // ✅ 修正這行
     : text;
 
   lastTicketId = id;
+  adjusted = false;
 
-  // ✅ 第 1 步：請 GAS 驗票（是否尚未使用）
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ id })   // 你的驗票 API
+    body: JSON.stringify({ id })
   })
   .then(r => r.json())
   .then(res => {
@@ -138,7 +138,7 @@ function onScan(text) {
 🆓 免費：${d.free}
 👤 本票人數：${d.people}`;
 
-    // ✅✅✅ 第 2 步：依「票內人數」正式進園 ✅✅✅
+    // ✅ 正式進園（依票內人數）
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -149,9 +149,7 @@ function onScan(text) {
       })
     });
 
-    // ✅ 顯示手動微調（預設不用）
     adjustArea.style.display = "block";
-
     scanning = false;
   })
   .catch(() => {
@@ -161,8 +159,12 @@ function onScan(text) {
   });
 }
 
-// ✅ 手動微調差額（±1 / ±2）
 function adjust(diff) {
+  if (adjusted) {
+    alert("⚠️ 本票已調整過");
+    return;
+  }
+
   if (!confirm(`確認手動調整 ${diff > 0 ? "+" : ""}${diff} 人？`)) return;
 
   fetch(API_URL, {
@@ -175,6 +177,8 @@ function adjust(diff) {
     })
   });
 
+  adjusted = true;
+  adjustArea.style.display = "none";
   alert("✅ 已完成手動調整");
 }
 </script>

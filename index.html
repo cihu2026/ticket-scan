@@ -3,21 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>⏱️ 後慈湖驗票</title>
+<title>🎟️ 後慈湖驗票系統</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-  body { font-family: "Noto Sans TC", sans-serif; background:#121212; color:white; text-align:center; padding:15px; }
-  h2 { color:#9be7ff; font-size:28px; }
-  #reader { max-width:600px; margin:10px auto; border-radius:25px; overflow:hidden; border:4px solid #444; background:#000; }
-  .status { margin:25px auto; padding:25px; font-size:18px; font-weight:900; border-radius:20px; white-space:pre-line; min-height: 100px; line-height: 1.5; }
-  .ok   { background:#2ecc71; text-align: left; } /* 成功時靠左對齊方便看明細 */
-  .err  { background:#e74c3c; }
-  .wait { background:#f1c40f; color:black; }
-  button { width:90%; max-width:500px; padding:20px; font-size:20px; margin:5px; border-radius:60px; border:none; background:linear-gradient(135deg,#3498db,#2980b9); color:white; cursor: pointer; }
-  #adjustArea { display:none; margin-top:15px; background: #222; padding: 15px; border-radius: 15px; }
-  input[type="number"] { width: 60%; padding: 12px; border-radius: 10px; border: none; font-size: 18px; text-align: center; }
+  :root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --primary: #00d2ff;
+    --success: #2ecc71;
+    --error: #e74c3c;
+    --warning: #f1c40f;
+  }
+
+  body { 
+    font-family: "Noto Sans TC", sans-serif; 
+    background: var(--bg-color); 
+    color: #e0e0e0; 
+    text-align: center; 
+    padding: 15px; 
+    margin: 0;
+  }
+
+  h2 { 
+    color: var(--primary); 
+    font-size: 26px; 
+    font-weight: 900; 
+    margin-top: 20px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+  }
+
+  /* 掃描框美化 */
+  #reader { 
+    max-width: 500px; 
+    margin: 20px auto; 
+    border-radius: 30px; 
+    overflow: hidden; 
+    border: 3px solid #333; 
+    background: #000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* 狀態卡片 */
+  .status { 
+    max-width: 500px;
+    margin: 20px auto; 
+    padding: 25px; 
+    font-size: 17px; 
+    font-weight: 700; 
+    border-radius: 25px; 
+    white-space: pre-line; 
+    min-height: 80px; 
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .ok { 
+    background: rgba(46, 204, 113, 0.15); 
+    border: 2px solid var(--success);
+    color: #fff;
+    text-align: left; 
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.2);
+  }
+
+  .err { 
+    background: rgba(231, 76, 60, 0.15); 
+    border: 2px solid var(--error);
+    color: #ff8a80;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
+  }
+
+  .wait { 
+    background: rgba(241, 196, 15, 0.1); 
+    border: 2px solid var(--warning);
+    color: var(--warning);
+  }
+
+  /* 按鈕樣式 */
+  button { 
+    width: 90%; 
+    max-width: 500px; 
+    padding: 18px; 
+    font-size: 19px; 
+    font-weight: 700;
+    margin: 10px 0; 
+    border-radius: 50px; 
+    border: none; 
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); 
+    color: white; 
+    cursor: pointer; 
+    box-shadow: 0 6px 15px rgba(0, 210, 255, 0.2);
+    transition: transform 0.1s;
+  }
+  button:active { transform: scale(0.96); }
+
+  /* 微調區域 */
+  #adjustArea { 
+    display: none; 
+    max-width: 500px;
+    margin: 20px auto; 
+    background: var(--card-bg); 
+    padding: 20px; 
+    border-radius: 25px; 
+    border: 1px solid #333;
+  }
+
+  .adj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .btn-small {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 0;
+    background: #444;
+    border-radius: 15px;
+    margin: 0;
+  }
+
+  .btn-plus { background: #2d5a27 !important; color: #a5d6a7; }
+  .btn-minus { background: #5a2727 !important; color: #ef9a9a; }
+
+  /* 輸入框 */
+  .input-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  input[type="number"] { 
+    flex: 1;
+    padding: 15px; 
+    border-radius: 15px; 
+    border: 2px solid #444; 
+    font-size: 18px; 
+    background: #121212;
+    color: white;
+    text-align: center;
+  }
+
+  .btn-send {
+    flex: 0.5;
+    background: #e67e22;
+    margin: 0;
+    border-radius: 15px;
+    font-size: 16px;
+  }
+
+  hr { border: 0; border-top: 1px dashed #444; margin: 15px 0; }
 </style>
 </head>
 
@@ -27,24 +169,25 @@
 
 <div id="reader"></div>
 <button id="start">📷 啟動相機驗票</button>
-<div id="status" class="status">請啟動相機</div>
+<div id="status" class="status">👋 您好！請點擊上方按鈕啟動掃描器</div>
 
 <div id="adjustArea">
-  <div style="margin-bottom:8px;color:#ccc;">🔧 實際進園人數微調</div>
-  <div style="margin-bottom: 10px;">
-    <button onclick="adjust(-1)" style="width:22%; font-size:16px; padding:10px 0;">-1</button>
-    <button onclick="adjust(1)" style="width:22%; font-size:16px; padding:10px 0;">+1</button>
-    <button onclick="adjust(-5)" style="width:22%; font-size:16px; padding:10px 0;">-5</button>
-    <button onclick="adjust(5)" style="width:22%; font-size:16px; padding:10px 0;">+5</button>
+  <div style="margin-bottom:12px; font-weight:700; color:var(--primary);">🔧 進園人數手動微調</div>
+  <div class="adj-grid">
+    <button class="btn-small btn-minus" onclick="adjust(-1)">-1</button>
+    <button class="btn-small btn-plus" onclick="adjust(1)">+1</button>
+    <button class="btn-small btn-minus" onclick="adjust(-5)">-5</button>
+    <button class="btn-small btn-plus" onclick="adjust(5)">+5</button>
   </div>
 
-  <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
+  <div class="input-group">
     <input type="number" id="manualDiff" placeholder="輸入數字(如 12)">
-    <button onclick="handleManualAdjust()" style="width: 30%; padding: 12px; font-size: 16px; background: #e67e22; border-radius: 10px;">送出</button>
+    <button class="btn-send" onclick="handleManualAdjust()">📤 送出</button>
   </div>
 </div>
 
 <script>
+// --- 這裡開始是你的 JS 邏輯 (保持不變) ---
 const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let html5QrCode;
@@ -70,10 +213,10 @@ function startCamera() {
     onScan
   ).catch(() => {
     statusEl.className = "status err";
-    statusEl.innerText = "❌ 相機啟動失敗";
+    statusEl.innerText = "❌ 相機啟動失敗，請檢查權限";
   });
   statusEl.className = "status wait";
-  statusEl.innerText = "📷 相機掃描中...";
+  statusEl.innerText = "🔍 正在尋找 QR Code...";
   document.getElementById("start").style.display = "none";
 }
 
@@ -85,7 +228,7 @@ function onScan(text) {
   lastTicketId = id;
   
   statusEl.className = "status wait";
-  statusEl.innerText = "⏳ 正在驗票中...";
+  statusEl.innerText = "⏳ 正在驗證票券資料...";
 
   fetch(API_URL, {
     method: "POST",
@@ -95,31 +238,30 @@ function onScan(text) {
   .then(res => {
     if (!res.ok) {
       statusEl.className = "status err";
-      statusEl.innerText = res.msg;
-      setTimeout(() => { scanning = false; }, 2000);
+      statusEl.innerText = "🚫 驗票失敗\n" + res.msg;
+      setTimeout(() => { scanning = false; }, 2500);
       return;
     }
 
     const d = res.detail;
     statusEl.className = "status ok";
-    // 這裡重新把明細加回來
     statusEl.innerText = 
-`✅ 驗票成功！已自動入園
+`✅ 驗票成功！歡迎入園
 
-👤 總人數：${d.people} 人
---------------------------
-🎫 現金：全${d.cash_full} / 團${d.cash_group} / 優${d.cash_discount}
-💳 悠遊：全${d.card_full} / 團${d.card_group} / 優${d.card_discount}
-🆓 免費：${d.free} 人
---------------------------
-📊 目前場內總人數：${res.current || '?'} 人`;
+👥 總入園人數：${d.people} 人
+<hr>
+🔸 現金：全${d.cash_full} / 團${d.cash_group} / 優${d.cash_discount}
+🔸 悠遊：全${d.card_full} / 團${d.card_group} / 優${d.card_discount}
+🔸 免費：${d.free} 人
+<hr>
+📊 當前場內總人數：${res.current || '?'} 人`;
 
     adjustArea.style.display = "block";
-    setTimeout(() => { scanning = false; }, 2000);
+    setTimeout(() => { scanning = false; }, 3000);
   })
   .catch(() => {
     statusEl.className = "status err";
-    statusEl.innerText = "❌ 網路連線失敗";
+    statusEl.innerText = "🌐 網路連線異常，請重新嘗試";
     scanning = false;
   });
 }
@@ -127,14 +269,14 @@ function onScan(text) {
 function handleManualAdjust() {
   const input = document.getElementById("manualDiff");
   const val = parseInt(input.value);
-  if (isNaN(val) || val === 0) return alert("請輸入有效數字");
+  if (isNaN(val) || val === 0) return alert("⚠️ 請輸入有效的人數");
   adjust(val);
   input.value = ""; 
 }
 
 function adjust(diff) {
   statusEl.className = "status wait";
-  statusEl.innerText = "⏳ 正在更新人數...";
+  statusEl.innerText = "🔄 正在同步雲端人數...";
   
   fetch(API_URL, {
     method: "POST",
@@ -148,10 +290,11 @@ function adjust(diff) {
   .then(r => r.json())
   .then(res => {
     statusEl.className = "status ok";
-    statusEl.innerText = `✅ 人數已修正 (${diff > 0 ? "+" : ""}${diff})\n📊 目前場內總人數：${res.current || '?'} 人`;
+    statusEl.innerText = `✅ 人數已修正成功 (${diff > 0 ? "+" : ""}${diff})\n\n📊 目前場內總人數：${res.current || '?'} 人`;
   })
-  .catch(() => alert("同步失敗"));
+  .catch(() => alert("❌ 同步失敗"));
 }
 </script>
+
 </body>
 </html>

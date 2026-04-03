@@ -79,7 +79,6 @@ button {
 </div>
 
 <script>
-// ✅ 統一後端 GAS（你目前正在使用的）
 const API_URL =
   "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
@@ -91,7 +90,7 @@ let adjusted = false;
 const statusEl = document.getElementById("status");
 const adjustArea = document.getElementById("adjustArea");
 
-// === 啟動相機 ===
+// 啟動相機
 document.getElementById("start").onclick = () => {
   qr = new Html5Qrcode("reader");
   qr.start(
@@ -104,13 +103,13 @@ document.getElementById("start").onclick = () => {
   adjustArea.style.display = "none";
 };
 
-// === 掃描到 QR ===
+// 掃描 QR
 function onScan(text) {
   if (scanning) return;
   scanning = true;
   qr.stop();
 
-  // ✅ 正確解析 id（用 & 不是 &amp;）
+  // ✅ 正確解析票號
   const id = text.includes("id=")
     ? text.split("id=")[1].split("&")[0]
     : text;
@@ -118,7 +117,7 @@ function onScan(text) {
   lastTicketId = id;
   adjusted = false;
 
-  // ✅ 第一步：驗票（尚未使用？）
+  // 驗票
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({ id })
@@ -136,7 +135,7 @@ function onScan(text) {
 
     statusEl.className = "status ok";
     statusEl.innerText =
-     `✅ 驗票成功
+`✅ 驗票成功
 
 🎫 現金全票：${d.cash_full}
 👥 現金團體：${d.cash_group}
@@ -147,7 +146,7 @@ function onScan(text) {
 🆓 免費：${d.free}
 👤 本票總人數：${d.people}`;
 
-    // ✅ 第二步：依票內人數進園
+    // ✅ 依票內人數進園
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -158,7 +157,6 @@ function onScan(text) {
       })
     });
 
-    // 顯示手動微調
     adjustArea.style.display = "block";
     scanning = false;
   })
@@ -169,7 +167,7 @@ function onScan(text) {
   });
 }
 
-// === 手動微調（只能一次） ===
+// 手動微調（僅一次）
 function adjust(diff) {
   if (adjusted) {
     alert("⚠️ 本票已調整過");

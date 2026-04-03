@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport"
   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>⏱️後慈湖驗票</title>
+<title>⏱️ 後慈湖驗票</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- ✅ 正確載入 html5-qrcode -->
+https://unpkg.com/html5-qrcodescript>
 
 <style>
 body {
@@ -78,17 +79,19 @@ button {
 </div>
 
 <script>
-// ✅ 統一後端 GAS
+// ✅ 統一後端 GAS（你目前正在使用的）
 const API_URL =
   "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let qr;
 let scanning = false;
 let lastTicketId = "";
-let adjusted = false; // ✅ 本票是否已微調
+let adjusted = false;
+
 const statusEl = document.getElementById("status");
 const adjustArea = document.getElementById("adjustArea");
 
+// === 啟動相機 ===
 document.getElementById("start").onclick = () => {
   qr = new Html5Qrcode("reader");
   qr.start(
@@ -101,18 +104,21 @@ document.getElementById("start").onclick = () => {
   adjustArea.style.display = "none";
 };
 
+// === 掃描到 QR ===
 function onScan(text) {
   if (scanning) return;
   scanning = true;
   qr.stop();
 
+  // ✅ 正確解析 id（用 & 不是 &amp;）
   const id = text.includes("id=")
-    ? text.split("id=")[1].split("&")[0]   // ✅ 修正這行
+    ? text.split("id=")[1].split("&")[0]
     : text;
 
   lastTicketId = id;
   adjusted = false;
 
+  // ✅ 第一步：驗票（尚未使用？）
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({ id })
@@ -130,15 +136,18 @@ function onScan(text) {
 
     statusEl.className = "status ok";
     statusEl.innerText =
-`✅ 驗票成功
+     `✅ 驗票成功
 
-🎫 全票：${d.cash_full + d.card_full}
-👥 團體：${d.cash_group + d.card_group}
-🧓 優待：${d.cash_discount + d.card_discount}
+🎫 現金全票：${d.cash_full}
+👥 現金團體：${d.cash_group}
+🧓 現金優待：${d.cash_discount}
+💳 悠遊全票：${d.card_full}
+💳 悠遊團體：${d.card_group}
+💳 悠遊優待：${d.card_discount}
 🆓 免費：${d.free}
-👤 本票人數：${d.people}`;
+👤 本票總人數：${d.people}`;
 
-    // ✅ 正式進園（依票內人數）
+    // ✅ 第二步：依票內人數進園
     fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -149,6 +158,7 @@ function onScan(text) {
       })
     });
 
+    // 顯示手動微調
     adjustArea.style.display = "block";
     scanning = false;
   })
@@ -159,6 +169,7 @@ function onScan(text) {
   });
 }
 
+// === 手動微調（只能一次） ===
 function adjust(diff) {
   if (adjusted) {
     alert("⚠️ 本票已調整過");

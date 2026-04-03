@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport"
   content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>後慈湖驗票</title>
+<title>⏱️後慈湖驗票</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -26,6 +26,7 @@ h2 { color:#9be7ff; font-size:28px; }
   border:4px solid #444;
   background:#000;
 }
+
 .status {
   margin:25px auto;
   padding:25px;
@@ -41,12 +42,22 @@ h2 { color:#9be7ff; font-size:28px; }
 button {
   width:90%;
   max-width:500px;
-  padding:25px;
-  font-size:26px;
+  padding:22px;
+  font-size:24px;
+  margin:6px;
   border-radius:60px;
   border:none;
   background:linear-gradient(135deg,#3498db,#2980b9);
   color:white;
+}
+
+/* 手動調整區 */
+#adjustArea {
+  display:none;
+  margin-top:15px;
+}
+#adjustArea button {
+  background:linear-gradient(135deg,#8e44ad,#9b59b6);
 }
 </style>
 </head>
@@ -59,14 +70,24 @@ button {
 <button id="start">📷 啟動相機驗票</button>
 <div id="status" class="status">請啟動相機</div>
 
+<div id="adjustArea">
+  <div style="margin-bottom:8px;color:#ccc;">🔧 實際進園人數微調</div>
+  <button onclick="adjust(-1)">-1</button>
+  <button onclick="adjust(1)">+1</button>
+  <button onclick="adjust(-2)">-2</button>
+  <button onclick="adjust(2)">+2</button>
+</div>
+
 <script>
-// ✅ 換成你真正的 GAS Web App
+// ✅ 統一後端 GAS（mode: IN）
 const API_URL =
   "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
 let qr;
 let scanning = false;
+let lastTicketId = "";
 const statusEl = document.getElementById("status");
+const adjustArea = document.getElementById("adjustArea");
 
 document.getElementById("start").onclick = () => {
   qr = new Html5Qrcode("reader");
@@ -77,6 +98,7 @@ document.getElementById("start").onclick = () => {
   );
   statusEl.className = "status wait";
   statusEl.innerText = "📷 相機啟動中…";
+  adjustArea.style.display = "none";
 };
 
 function onScan(text) {
@@ -88,38 +110,49 @@ function onScan(text) {
     ? text.split("id=")[1].split("&")[0]
     : text;
 
+  lastTicketId = id;
+
+  // ✅ 第 1 步：請 GAS 驗票（是否尚未使用）
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ id })   // 你的驗票 API
   })
-  .then(r => r.json())   // ✅ 改成接 JSON
+  .then(r => r.json())
   .then(res => {
     if (!res.ok) {
       statusEl.className = "status err";
       statusEl.innerText = res.msg;
-    } else {
-      const d = res.detail;
-      statusEl.className = "status ok";
-      statusEl.innerText =
-`✅ ${res.msg}
+      scanning = false;
+      return;
+    }
+
+    const d = res.detail;
+
+    statusEl.className = "status ok";
+    statusEl.innerText =
+`✅ 驗票成功
 
 🎫 全票：${d.cash_full + d.card_full}
 👥 團體：${d.cash_group + d.card_group}
 🧓 優待：${d.cash_discount + d.card_discount}
 🆓 免費：${d.free}
-👤 總人數：${d.people}`;
-    }
+👤 本票人數：${d.people}`;
+
+    // ✅✅✅ 第 2 步：依「票內人數」正式進園 ✅✅✅
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        mode: "IN",
+        delta: d.people,
+        source: "SCAN_IN",
+        note: "qr=" + id
+      })
+    });
+
+    // ✅ 顯示手動微調（預設不用）
+    adjustArea.style.display = "block";
 
     scanning = false;
-    setTimeout(() => {
-      statusEl.className = "status wait";
-      statusEl.innerText = "🟢 請掃描下一張票";
-      qr.start(
-        { facingMode:"environment" },
-        { fps:15, qrbox:250 },
-        onScan
-      );
-    }, 3000);
   })
   .catch(() => {
     statusEl.className = "status err";
@@ -127,17 +160,23 @@ function onScan(text) {
     scanning = false;
   });
 }
-// 🎫 驗票成功時自動呼叫
-fetch("你的GAS網址", {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify({ 
-    type: "IN", 
-    delta: 1, 
-    source: "驗票槍掃描" 
-  })
-});
 
+// ✅ 手動微調差額（±1 / ±2）
+function adjust(diff) {
+  if (!confirm(`確認手動調整 ${diff > 0 ? "+" : ""}${diff} 人？`)) return;
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      mode: "IN",
+      delta: diff,
+      source: "SCAN_ADJUST",
+      note: "manual_adjust qr=" + lastTicketId
+    })
+  });
+
+  alert("✅ 已完成手動調整");
+}
 </script>
 
 </body>

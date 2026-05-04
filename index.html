@@ -3,340 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎟️ 後慈湖驗票系統 v4.5</title>
+<title>🌲 後慈湖 | 智慧驗票系統</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-:root{
-    --primary:#00d2ff;
-    --success:#2ecc71;
-    --error:#ff6b6b;
-    --warning:#f1c40f;
-    --bg:#0f172a;
-    --glass:rgba(255,255,255,0.08);
-    --gold:#d4af37;
-}
+    :root {
+        --primary: #00d2ff;
+        --accent: #d4af37;
+        --success: #2ecc71;
+        --error: #e74c3c;
+        --glass: rgba(255, 255, 255, 0.05);
+        --glass-heavy: rgba(15, 23, 42, 0.8);
+    }
 
-body{
-    margin:0;
-    background:linear-gradient(180deg,#0f172a,#020617);
-    color:#fff;
-    font-family:"Noto Sans TC",sans-serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-height: 100vh;
-}
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at top, #1e293b 0%, #020617 100%);
+        color: #f8fafc;
+        font-family: -apple-system, "Noto Sans TC", sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-h2{
-    margin:20px 0;
-    font-weight:900;
-    letter-spacing:2px;
-    background:linear-gradient(90deg,#00d2ff,#3a7bd5);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
+    /* 標題欄 */
+    .header {
+        width: 100%;
+        padding: 20px 0;
+        text-align: center;
+        background: var(--glass-heavy);
+        backdrop-filter: blur(15px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    }
 
-/* 掃描區 */
-#reader-container{
-    position:relative;
-    width:90%;
-    max-width:420px;
-    border-radius:24px;
-    overflow:hidden;
-    background:#000;
-    border: 2px solid rgba(255,255,255,0.1);
-}
+    h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        font-weight: 900;
+    }
 
-.scan-line{
-    position:absolute;
-    width:100%;
-    height:3px;
-    background:var(--primary);
-    box-shadow: 0 0 10px var(--primary);
-    animation:scan 2s linear infinite;
-    display:none;
-    z-index: 10;
-}
+    /* 掃描區 */
+    .scanner-wrapper {
+        position: relative;
+        width: 88%;
+        max-width: 380px;
+        margin-top: 20px;
+        border-radius: 30px;
+        padding: 8px;
+        background: rgba(255,255,255,0.03);
+        border: 2px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    }
 
-@keyframes scan{
-    0%{top:0}
-    100%{top:100%}
-}
+    #reader {
+        width: 100% !important;
+        border-radius: 22px;
+        overflow: hidden;
+        border: none !important;
+    }
 
-/* 控制區 */
-.controls{
-    width:90%;
-    max-width:420px;
-    margin-top:15px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
+    /* 控制面板 */
+    .main-panel {
+        width: 92%;
+        max-width: 400px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-button{
-    border:none;
-    border-radius:12px;
-    padding:14px;
-    font-weight:800;
-    cursor:pointer;
-    transition: 0.2s;
-}
+    button {
+        border-radius: 18px;
+        border: none;
+        font-weight: 800;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-#start{
-    background:linear-gradient(135deg,#00d2ff,#3a7bd5);
-    color:#fff;
-    font-size: 1.1rem;
-}
+    #start-btn {
+        background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+        color: white;
+        padding: 18px;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
+    }
 
-.input-group{
-    display:flex;
-    background:var(--glass);
-    border-radius:12px;
-    padding:5px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
+    .input-box {
+        display: flex;
+        background: var(--glass-heavy);
+        border-radius: 18px;
+        padding: 5px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
 
-input{
-    flex:1;
-    background:transparent;
-    border:none;
-    color:#fff;
-    padding:10px;
-    font-size: 16px;
-    outline: none;
-}
+    .input-box input {
+        flex: 1; background: transparent; border: none; color: white;
+        padding: 12px 15px; font-size: 16px; outline: none;
+    }
 
-/* 狀態卡片 */
-#status{
-    width:90%;
-    max-width:400px;
-    margin-top:20px;
-    padding:20px;
-    border-radius:24px;
-    background:var(--glass);
-    text-align:center;
-    border-left:8px solid #333;
-    box-sizing: border-box;
-}
+    .btn-verify { background: var(--accent); color: #000; padding: 0 20px; border-radius: 14px; }
 
-.status.ok{border-color:var(--success); background: rgba(46, 204, 113, 0.1);}
-.status.err{border-color:var(--error); background: rgba(255, 107, 107, 0.1);}
-.status.wait{border-color:var(--warning); background: rgba(241, 196, 15, 0.1);}
+    /* 狀態卡片 */
+    .status-card {
+        background: var(--glass-heavy);
+        backdrop-filter: blur(25px);
+        border-radius: 32px;
+        padding: 25px 20px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
 
-.big{font-size:32px;font-weight:900; margin-bottom: 10px;}
+    #status-text { font-size: 1.8rem; font-weight: 900; margin-bottom: 20px; transition: 0.3s; }
 
-/* 人數微調 (➕➖) */
-.counter{
-    margin: 15px 0;
-    display:flex;
-    justify-content:center;
-    align-items: center;
-    gap: 25px;
-}
+    /* 人數控制區 */
+    .counter-area {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 10px 0;
+    }
 
-.btn-adj{
-    width:55px;
-    height:55px;
-    border-radius:50%;
-    background:var(--gold);
-    color: #000;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .adj-btn {
+        width: 65px; height: 65px;
+        background: rgba(255,255,255,0.08);
+        color: white;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
 
-#count{font-size: 28px; font-weight: 800; color: var(--gold); min-width: 100px;}
+    .adj-btn:active { transform: scale(0.9); background: var(--primary); }
 
-/* 🔢 快速數值調整輸入區 */
-.adjust-panel {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
+    .count-display { text-align: center; }
+    .count-label { font-size: 0.85rem; opacity: 0.6; margin-bottom: 2px; letter-spacing: 1px; }
+    #count-num { font-size: 3.8rem; font-weight: 800; line-height: 1; color: #fff; }
 
-.adjust-box{
-    display:flex;
-    gap:8px;
-    justify-content:center;
-}
+    /* 快速調整面板 */
+    .quick-adjust {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+    }
 
-.adjust-box input{
-    width:100px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--gold);
-    border-radius: 10px;
-    text-align:center;
-    font-size: 18px;
-}
+    .quick-adjust input {
+        width: 100px;
+        background: rgba(0,0,0,0.5);
+        border: 1px solid var(--accent);
+        border-radius: 12px;
+        color: white;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
 
-.btn-apply {
-    background: var(--gold);
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-}
+    .btn-apply { background: var(--accent); color: #000; padding: 10px 20px; border-radius: 12px; }
+
+    /* 動態狀態顏色 */
+    .status-ok { color: var(--success); text-shadow: 0 0 15px rgba(46, 204, 113, 0.4); }
+    .status-err { color: var(--error); text-shadow: 0 0 15px rgba(231, 76, 60, 0.4); }
 </style>
 </head>
 
 <body>
 
-<h2>🎟️ 後慈湖驗票系統</h2>
+<div class="header">
+    <h2>🌲 後慈湖驗票系統</h2>
+</div>
 
-<div id="reader-container">
-    <div class="scan-line" id="line"></div>
+<div class="scanner-wrapper">
     <div id="reader"></div>
 </div>
 
-<div class="controls">
-    <button id="start">📷 點擊啟動掃描</button>
+<div class="main-panel">
+    <button id="start-btn" onclick="initScanner()">📷 啟動相機掃描</button>
 
     <div class="input-group">
-        <input id="manual" placeholder="⌨️ 手動輸入票號碼">
-        <button onclick="manualCheck()" style="background:var(--primary); color:#000; border-radius: 8px;">驗證</button>
-    </div>
-</div>
-
-<div id="status" class="status">
-    <div id="msg" class="big">⏳ 準備就緒</div>
-
-    <div class="counter">
-        <button class="btn-adj" onclick="adjust(-1)">➖</button>
-        <div id="count">👥 0</div>
-        <button class="btn-adj" onclick="adjust(1)">➕</button>
+        <div class="input-box">
+            <input id="manual-id" placeholder="⌨️ 手動輸入票號...">
+            <button class="btn-verify" onclick="manualCheck()">驗證</button>
+        </div>
     </div>
 
-    <!-- 🔢 快速批量微調區 -->
-    <div class="adjust-panel">
-        <div style="font-size: 14px; opacity: 0.6; margin-bottom: 8px;">批量人數校正 (例: 5 或 -5)</div>
-        <div class="adjust-box">
-            <input type="number" id="adjInput" placeholder="🔢 數字">
-            <button class="btn-apply" onclick="applyAdjust()">套用調整</button>
+    <div id="status-display" class="status-card">
+        <div id="status-text">⏳ 準備就緒</div>
+        
+        <div class="counter-area">
+            <button class="adj-btn" onclick="changeCount(-1)">➖</button>
+            
+            <div class="count-display">
+                <div class="count-label">場內人數</div>
+                <div id="count-num">0</div>
+            </div>
+
+            <button class="adj-btn" onclick="changeCount(1)">➕</button>
+        </div>
+
+        <div class="quick-adjust">
+            <input type="number" id="quick-num" placeholder="🔢 0">
+            <button class="btn-apply" onclick="quickAdjust()">套用校正</button>
         </div>
     </div>
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
+    const API = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
+    let qrScanner;
+    let currentCount = 0;
+    let isScanning = false;
 
-let qr;
-let lastId="";
-let count=0;
-let cache=[];
-let history=[];
-
-let lastScanTime=0;
-const DELAY=1500;
-
-const msg=document.getElementById("msg");
-const countEl=document.getElementById("count");
-
-// 啟動掃描
-document.getElementById("start").onclick=()=>{
-    qr=new Html5Qrcode("reader");
-    document.getElementById("line").style.display="block";
-
-    qr.start({facingMode:"environment"},{fps:30,qrbox:250,aspectRatio:1.0},onScan)
-    .catch(()=>show("❌ 鏡頭開啟失敗","err"));
-};
-
-// 掃描回傳
-function onScan(text){
-    let now=Date.now();
-    if(now-lastScanTime<DELAY) return;
-    lastScanTime=now;
-
-    let id=text.includes("id=")?text.split("id=")[1].split("&")[0]:text;
-    if(!id) return;
-
-    if(id===lastId){
-        show("⚠️ 重複掃描","err");
-        if(navigator.vibrate) navigator.vibrate(200);
-        return;
+    function initScanner() {
+        qrScanner = new Html5Qrcode("reader");
+        qrScanner.start(
+            { facingMode: "environment" },
+            { fps: 25, qrbox: { width: 250, height: 250 } },
+            onScanSuccess
+        ).catch(err => updateUI("❌ 鏡頭啟動失敗", "status-err"));
     }
 
-    lastId=id;
-    show("🔍 驗證中...","wait");
-    send({id, action:"verify"});
-}
-
-function manualCheck(){
-    let v=document.getElementById("manual").value.trim();
-    if(v) onScan(v);
-}
-
-function send(data){
-    fetch(API,{method:"POST",body:JSON.stringify(data)})
-    .then(r=>r.json())
-    .then(res=>{
-        if(!res.ok){
-            show("🚫 無效票券","err");
-            return;
-        }
-        history.push(data.id);
-        count = res.current ?? (count+1);
-        update();
-        show("✅ 驗證通過","ok");
-        if(navigator.vibrate) navigator.vibrate(80);
-        flush();
-    })
-    .catch(()=>{
-        cache.push(data);
-        show("📡 訊號不穩-已存暫存","wait");
-    });
-}
-
-// ➖➕ 單筆調整
-function adjust(n){
-    count=Math.max(0,count+n);
-    update();
-    syncToBackend();
-}
-
-// 🔢 批量輸入調整 (重點修正)
-function applyAdjust(){
-    let inputEl = document.getElementById("adjInput");
-    let v = parseInt(inputEl.value);
-    
-    if(isNaN(v)) {
-        alert("請輸入有效的數字");
-        return;
+    function onScanSuccess(text) {
+        if (isScanning) return;
+        isScanning = true;
+        let id = text.includes("id=") ? text.split("id=")[1].split("&")[0] : text;
+        updateUI("🔍 正在驗證...", "");
+        fetchVerify({ id, action: "verify" });
+        setTimeout(() => { isScanning = false; }, 2000);
     }
 
-    count = Math.max(0, count + v);
-    update();
-    
-    // 清空輸入框
-    inputEl.value = "";
-    
-    // 震動回饋
-    if(navigator.vibrate) navigator.vibrate(50);
-    
-    syncToBackend();
-}
+    function manualCheck() {
+        let val = document.getElementById("manual-id").value.trim();
+        if (val) onScanSuccess(val);
+    }
 
-function update(){
-    countEl.innerText="👥 " + count;
-}
+    function fetchVerify(data) {
+        fetch(API, { method: "POST", body: JSON.stringify(data) })
+        .then(r => r.json())
+        .then(res => {
+            if (res.ok) {
+                updateUI("✅ 驗證成功", "status-ok");
+                currentCount = res.current || (currentCount + 1);
+                document.getElementById("count-num").innerText = currentCount;
+            } else {
+                updateUI("🚫 票券無效", "status-err");
+            }
+        })
+        .catch(() => updateUI("📡 網路連線異常", ""));
+    }
 
-// 同步人數到後端
-function syncToBackend(){
-    fetch(API,{method:"POST", body:JSON.stringify({action:"sync", count: count})});
-}
+    function changeCount(n) {
+        currentCount = Math.max(0, currentCount + n);
+        document.getElementById("count-num").innerText = currentCount;
+        syncCount();
+    }
 
-function flush(){
-    if(cache.length===0) return;
-    let t=[...cache];
-    cache=[];
-    t.forEach(send);
-}
+    function quickAdjust() {
+        let n = parseInt(document.getElementById("quick-num").value);
+        if (!isNaN(n)) changeCount(n);
+        document.getElementById("quick-num").value = "";
+    }
 
-function show(t,type){
-    document.getElementById("status").className="status "+type;
-    msg.innerText=t;
-}
+    function updateUI(text, className) {
+        const title = document.getElementById("status-text");
+        title.innerText = text;
+        title.className = className;
+        if (navigator.vibrate) navigator.vibrate(className === 'status-ok' ? 80 : 200);
+    }
+
+    function syncCount() {
+        fetch(API, { method: "POST", body: JSON.stringify({ action: "sync", count: currentCount }) });
+    }
 </script>
 
 </body>

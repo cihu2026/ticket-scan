@@ -2,367 +2,202 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎟️ 後慈湖驗票系統 Turbo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎟️ 驗票系統 PRO v3</title>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-:root{
---bg:#121212;
---card:#1e1e1e;
---line:#333;
---blue:#00d2ff;
---green:#2ecc71;
---red:#e74c3c;
---yellow:#f1c40f;
-}
-
-*{box-sizing:border-box;}
-
 body{
 margin:0;
-padding:15px;
-font-family:"Noto Sans TC",sans-serif;
-background:var(--bg);
+background:#121212;
 color:#fff;
+font-family:sans-serif;
 text-align:center;
 }
-
-h2{
-margin:12px 0 16px;
-font-size:24px;
-font-weight:900;
-color:var(--blue);
-}
-
+h2{color:#00d2ff;}
 #reader{
 max-width:500px;
-margin:0 auto 14px;
-border-radius:22px;
+margin:auto;
+border-radius:20px;
 overflow:hidden;
-background:#000;
-border:2px solid #222;
-box-shadow:0 10px 28px rgba(0,0,0,.45);
 }
-
-#start{
-width:92%;
-max-width:500px;
-padding:17px;
+button{
+padding:15px;
 border:none;
 border-radius:50px;
-font-size:19px;
 font-weight:900;
-color:#fff;
-cursor:pointer;
-background:linear-gradient(135deg,#00d2ff,#3a7bd5);
-margin-bottom: 10px;
+margin:5px;
 }
-
+#start{background:#00d2ff;color:#000;}
 .status{
-max-width:500px;
-margin:14px auto;
-padding:18px;
-min-height:72px;
-border-radius:20px;
-background:var(--card);
-border:1px solid var(--line);
-line-height:1.6;
-font-size:16px;
+margin:15px;
+padding:20px;
+border-radius:15px;
+background:#1e1e1e;
 }
-
-.wait{border:2px solid var(--yellow); color:var(--yellow);}
-.ok{border:2px solid var(--green); background:rgba(46,204,113,.08);}
-.err{border:2px solid var(--red); color:#ff9e9e; background:rgba(231,76,60,.08);}
-
-/* 手動輸入區塊美化 */
-.manual-box {
-    max-width: 500px;
-    margin: 0 auto 15px;
-    display: flex;
-    gap: 8px;
-}
-
-#adjustArea{
-display:none;
-max-width:500px;
-margin:14px auto;
-padding:16px;
-border-radius:20px;
-background:var(--card);
-border:1px solid #333;
-}
-
-.adj-grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-margin-bottom:12px;
-}
-
-.btn-adj{
-border:none;
-border-radius:12px;
-padding:12px 0;
-font-size:16px;
-font-weight:900;
-cursor:pointer;
-}
-
-.plus{background:#214d2b;color:#b9f6ca;}
-.minus{background:#5a2727;color:#ffcdd2;}
-
-.input-group{
-display:flex;
-gap:10px;
-}
-
-input{
-flex:1;
-padding:12px;
-border-radius:12px;
-border:1px solid #444;
-background:#111;
-color:#fff;
-font-size:16px;
-text-align:center;
-}
-
-input:focus{outline:none; border-color:var(--blue);}
-
-.btn-send{
-flex:.45;
-border:none;
-border-radius:12px;
-font-weight:900;
-background:#e67e22;
-color:#fff;
-cursor:pointer;
-}
-
-.btn-manual{
-background:#34495e;
-color:#fff;
-flex:0.4;
-}
-
-.hr{
-border-top:1px dashed #444;
-margin:10px 0;
-}
-
 .big{
-font-size:18px;
+font-size:28px;
 font-weight:900;
 }
+.err{color:#ff6b6b;}
+.ok{color:#2ecc71;}
+.wait{color:#f1c40f;}
 </style>
 </head>
 
 <body>
 
-<h2>🎟️ 後慈湖驗票系統 Turbo</h2>
+<h2>🎟️ 驗票系統 PRO v3</h2>
 
 <div id="reader"></div>
 
-<button id="start">📷 啟動相機驗票</button>
+<button id="start">📷 啟動掃描</button>
 
-<!-- 手動輸入區 -->
-<div class="manual-box">
-    <input type="text" id="manualTicketInput" placeholder="請手動輸入票號">
-    <button id="manualSubmitBtn" class="btn-send btn-manual">🎫 驗票</button>
+<div>
+<input id="manual" placeholder="手動輸入票號">
+<button onclick="manualCheck()">驗票</button>
 </div>
 
-<div id="status" class="status">
-👋 請點擊上方按鈕或輸入票號
-</div>
-
-<div id="adjustArea">
-<div style="font-weight:900;color:var(--blue);margin-bottom:10px;">🔧 進園人數微調</div>
-
-<div class="adj-grid">
-<button class="btn-adj minus" onclick="adjust(-1)">-1</button>
-<button class="btn-adj plus" onclick="adjust(1)">+1</button>
-<button class="btn-adj minus" onclick="adjust(-5)">-5</button>
-<button class="btn-adj plus" onclick="adjust(5)">+5</button>
-</div>
-
-<div class="input-group">
-<input type="number" id="manualDiff" placeholder="輸入數字">
-<button class="btn-send" onclick="handleManualAdjust()">📤送出</button>
-</div>
-</div>
+<div id="status" class="status">等待中</div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
+const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
-let qr=null;
+// 🔐 前端驗證碼（要跟後端一致）
+const TOKEN="abc123";
+
+let qr;
 let scanning=false;
-let lastScan=0;
-let lastTicketId="";
+let lastId="";
+let cache=[];
+
+// 🔊 音效
+const okSound=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const errSound=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
 const statusEl=document.getElementById("status");
-const startBtn=document.getElementById("start");
-const adjArea=document.getElementById("adjustArea");
-const manualInput = document.getElementById("manualTicketInput");
-const manualBtn = document.getElementById("manualSubmitBtn");
 
-// 啟動相機
-startBtn.onclick=()=>{
-    if(qr) return;
-    startBtn.innerText="⏳ 啟動中...";
-    startCamera();
-};
+// 啟動
+document.getElementById("start").onclick=()=>{
+qr=new Html5Qrcode("reader");
 
-// 手動輸入驗票
-manualBtn.onclick=()=>{
-    const val = manualInput.value.trim();
-    if(!val) return;
-    onScan(val);
-    manualInput.value = "";
-};
-
-function startCamera(){
-    qr=new Html5Qrcode("reader");
-    qr.start(
-        {facingMode:"environment"},
-        {
-            fps:30,
-            qrbox:{width:200,height:200},
-            aspectRatio:1,
-            disableFlip:true,
-            rememberLastUsedCamera:true,
-            videoConstraints:{
-                facingMode:"environment",
-                width:{ideal:640},
-                height:{ideal:480}
-            }
-        },
-        onScan
-    ).then(()=>{
-        statusEl.className="status wait";
-        statusEl.textContent="🔍 正在尋找 QR Code...";
-        startBtn.style.display="none";
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="❌ 相機啟動失敗";
-        startBtn.innerText="📷 重試啟動";
-        qr=null;
-    });
+qr.start(
+{facingMode:"environment"},
+{
+fps:30,
+qrbox:220,
+videoConstraints:{
+width:{ideal:1280},
+height:{ideal:720}
 }
+},
+onScan
+);
+};
 
+// 掃描
 function onScan(text){
-    const now=Date.now();
-    if(scanning || (now-lastScan < 1200)) return;
 
-    lastScan=now;
-    scanning=true;
+if(scanning) return;
 
-    if(navigator.vibrate) navigator.vibrate(50);
+const id=text.includes("id=")
+? text.split("id=")[1].split("&")[0]
+: text;
 
-    statusEl.className="status wait";
-    statusEl.textContent="⚡ 驗證中...";
-
-    // 如果相機正在運行，先暫停
-    if(qr && qr.getState() === 2) qr.pause(true);
-
-    const id=text.includes("id=")
-        ? text.split("id=")[1].split("&")[0]
-        : text;
-
-    lastTicketId=id;
-
-    fetch(API_URL,{
-        method:"POST",
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        cache:"no-store",
-        keepalive:true,
-        body:JSON.stringify({
-            id:id,
-            action:"verify"
-        })
-    })
-    .then(r=>r.json())
-    .then(res=>{
-        if(!res.ok){
-            statusEl.className="status err";
-            statusEl.textContent="🚫 驗票失敗 " + (res.msg || "");
-            resumeScan(900);
-            return;
-        }
-
-        renderSuccess(res);
-        adjArea.style.display="block";
-        resumeScan(1600);
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="🌐 網路異常";
-        resumeScan(900);
-    });
+// 防重票
+if(id===lastId){
+show("⚠️ 重複票號","err");
+errSound.play();
+return;
 }
 
-function resumeScan(ms){
-    setTimeout(()=>{
-        // 只有在相機處於暫停狀態時才恢復
-        if(qr && qr.getState() === 3) qr.resume();
-        scanning=false;
-    },ms);
+scanning=true;
+lastId=id;
+
+show("驗證中...","wait");
+
+// 👉 送出
+send({
+id:id,
+action:"verify",
+token:TOKEN
+});
 }
 
-function renderSuccess(res){
-    const d=res.detail || {};
-    statusEl.className="status ok";
-    statusEl.innerHTML=`
-        <div class="big" style="color:#2ecc71;">✅ 驗票通過</div>
-        <div style="margin-top:8px;">👥 總人數：<span class="big">${d.people || 0}</span> 人</div>
-        <div class="hr"></div>
-        <div>🔸 現金：${d.cash_full || 0}全 / ${d.cash_group || 0}團 / ${d.cash_discount || 0}優</div>
-        <div>🔸 悠遊：${d.card_full || 0}全 / ${d.card_group || 0}團 / ${d.card_discount || 0}優</div>
-        <div>🔸 免費：${d.free || 0} 人</div>
-        <div class="hr"></div>
-        <div class="big">📊 場內總計：${res.current || 0} 人</div>
-    `;
+// 手動
+function manualCheck(){
+let val=document.getElementById("manual").value.trim();
+
+if(!/^[A-Za-z0-9_-]+$/.test(val)){
+show("票號格式錯誤","err");
+return;
 }
 
-function handleManualAdjust(){
-    const val=parseInt(document.getElementById("manualDiff").value);
-    if(isNaN(val)||val===0) return;
-    adjust(val);
-    document.getElementById("manualDiff").value="";
+onScan(val);
 }
 
-function adjust(diff){
-    statusEl.className="status wait";
-    statusEl.textContent="🔄 同步中...";
+// API
+function send(data){
 
-    fetch(API_URL,{
-        method:"POST",
-        cache:"no-store",
-        keepalive:true,
-        body:JSON.stringify({
-            type:"IN",
-            delta:diff,
-            source:"驗票端微調",
-            note:"票號:"+lastTicketId
-        })
-    })
-    .then(r=>r.json())
-    .then(res=>{
-        statusEl.className="status ok";
-        statusEl.innerHTML=`
-            <div class="big" style="color:#2ecc71;">
-            ✅ 已修正 ${diff>0?'+':''}${diff}
-            </div>
-            <div class="hr"></div>
-            <div class="big">📊 目前場內：${res.current || 0} 人</div>
-        `;
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="❌ 同步失敗";
-    });
+fetch(API,{
+method:"POST",
+body:JSON.stringify(data)
+})
+.then(r=>{
+if(!r.ok) throw "http error";
+return r.json();
+})
+.then(res=>{
+
+if(!res.ok){
+show("🚫 驗票失敗","err");
+errSound.play();
+scanning=false;
+return;
+}
+
+okSound.play();
+
+show(`
+<div class="big">✅ 通過</div>
+<div class="big">👥 ${res.current || 0} 人</div>
+`,"ok");
+
+scanning=false;
+
+// 🔥 補送暫存
+flushCache();
+
+})
+.catch(()=>{
+
+// ❗離線暫存
+cache.push(data);
+
+show("⚠️ 離線暫存中","wait");
+
+scanning=false;
+
+});
+}
+
+// 補送
+function flushCache(){
+if(cache.length===0) return;
+
+let temp=[...cache];
+cache=[];
+
+temp.forEach(d=>send(d));
+}
+
+// UI
+function show(msg,type){
+statusEl.className="status "+type;
+statusEl.innerHTML=msg;
+
+if(navigator.vibrate) navigator.vibrate(50);
 }
 </script>
 

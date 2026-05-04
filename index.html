@@ -7,142 +7,67 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            --primary: #00d2ff;
-            --success: #2ecc71;
-            --error: #ff6b6b;
-            --warning: #f1c40f;
-            --bg: #121212;
-            --card: #1e1e1e;
+            --primary: #00d2ff; --success: #2ecc71; --error: #ff6b6b;
+            --warning: #f1c40f; --bg: #121212; --card: #1e1e1e;
         }
-
         body {
-            margin: 0;
-            background: var(--bg);
-            color: #fff;
+            margin: 0; background: var(--bg); color: #fff;
             font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-bottom: 30px;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; padding-bottom: 30px;
         }
-
         h2 {
-            margin: 20px 0;
-            letter-spacing: 2px;
+            margin: 20px 0; letter-spacing: 2px;
             background: linear-gradient(to right, #00d2ff, #92fe9d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             font-weight: 800;
         }
-
         #reader-container {
-            position: relative;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            overflow: hidden;
+            position: relative; width: 90%; max-width: 400px;
+            border-radius: 24px; overflow: hidden;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 2px solid rgba(255,255,255,0.1);
-            background: #000;
+            border: 2px solid rgba(255,255,255,0.1); background: #000;
         }
-
         #reader { width: 100% !important; border: none !important; }
-
         .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            box-shadow: 0 0 20px var(--primary);
-            animation: scan 2s linear infinite;
-            z-index: 10;
-            display: none;
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--primary); box-shadow: 0 0 20px var(--primary);
+            animation: scan 2s linear infinite; z-index: 10; display: none;
         }
-
         @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-
-        .controls {
-            width: 90%;
-            max-width: 400px;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .controls { width: 90%; max-width: 400px; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
         button {
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            padding: 16px; border: none; border-radius: 14px; font-size: 16px;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-
         #start-btn {
             background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+            color: white; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
         }
-        
-        #start-btn:active { transform: scale(0.95); }
-
         .input-group {
-            display: flex;
-            background: var(--card);
-            border-radius: 14px;
-            padding: 6px;
-            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; background: var(--card); border-radius: 14px;
+            padding: 6px; border: 1px solid rgba(255,255,255,0.1);
         }
-
         input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            outline: none;
-            font-size: 16px;
+            flex: 1; background: transparent; border: none; color: white;
+            padding: 10px 15px; outline: none; font-size: 16px;
         }
-
-        .btn-manual { 
-            background: #333; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 10px;
-        }
-
         #status {
-            width: 85%;
-            max-width: 380px;
-            margin-top: 25px;
-            padding: 25px;
-            border-radius: 24px;
-            background: var(--card);
-            border-left: 10px solid #444;
+            width: 85%; max-width: 380px; margin-top: 25px; padding: 25px;
+            border-radius: 24px; background: var(--card); border-left: 10px solid #444;
             transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-
         .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.15); }
         .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.15); }
         .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.15); }
-
         .big { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-        .sub { font-size: 15px; opacity: 0.8; letter-spacing: 0.5px; }
+        .sub { font-size: 15px; opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <h2>🌈 後慈湖驗票系統 </h2>
+    <h2>🌈 後慈湖驗票系統</h2>
 
     <div id="reader-container">
         <div class="scan-line" id="line"></div>
@@ -153,97 +78,91 @@
         <button id="start-btn">📸 啟動掃描鏡頭</button>
         <div class="input-group">
             <input id="manual-input" type="text" placeholder="⌨️ 手動輸入票號...">
-            <button class="btn-manual" onclick="manualCheck()">🔍 驗票</button>
+            <button style="background:#333; color:white; padding:10px;" onclick="manualCheck()">🔍 驗票</button>
         </div>
     </div>
 
     <div id="status" class="status">
         <div class="big">😴 準備就緒</div>
-        <div class="sub">請點擊上方按鈕開啟相機開始工作</div>
+        <div class="sub">請確保使用 Safari/Chrome 並授權相機</div>
     </div>
 
 <script>
-    const API_URL = "你的_GAS_部署網址"; 
+    // 1. 設定區
+    const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec"; 
     const TOKEN = "abc123";
 
     let html5QrCode;
     let isProcessing = false;
-    let lastResult = "";
-
     const okSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
     const errSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
     const statusEl = document.getElementById("status");
     const scanLine = document.getElementById("line");
+    const startBtn = document.getElementById("start-btn");
 
-    document.getElementById("start-btn").onclick = function() {
-        if (html5QrCode) return;
+    // 2. 啟動相機邏輯
+    startBtn.onclick = async function() {
+        if (html5QrCode) {
+            await html5QrCode.stop().catch(() => {});
+        }
         
-        this.innerHTML = "🔄 正在啟動...";
         html5QrCode = new Html5Qrcode("reader");
         scanLine.style.display = "block";
-        
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 25, qrbox: { width: 250, height: 250 } },
-            onScanSuccess
-        ).then(() => {
-            this.innerHTML = "🟢 掃描器運行中";
-            this.style.opacity = "0.6";
-            updateStatus("🚀 掃描器已就緒", "ok");
-        }).catch(err => {
-            updateStatus("❌ 無法開啟鏡頭", "err");
-            this.innerHTML = "⚠️ 啟動失敗";
-        });
+        startBtn.innerHTML = "🔄 授權中...";
+
+        const config = { fps: 20, qrbox: { width: 250, height: 250 } };
+
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+            .then(() => {
+                startBtn.innerHTML = "🟢 掃描中";
+                updateStatus("🚀 請對準 QR Code", "ok");
+            })
+            .catch(err => {
+                // 若後鏡頭失敗，嘗試任何鏡頭
+                html5QrCode.start({ facingMode: "user" }, config, onScanSuccess)
+                    .catch(e => {
+                        alert("相機開啟失敗，請檢查權限設定！");
+                        updateStatus("❌ 鏡頭啟動失敗", "err");
+                    });
+            });
     };
 
-    function onScanSuccess(decodedText) {
+    function onScanSuccess(text) {
         if (isProcessing) return;
-
-        let id = decodedText;
-        if (decodedText.includes("id=")) {
-            const urlParams = new URLSearchParams(decodedText.split('?')[1]);
-            id = urlParams.get('id');
+        
+        // 簡單解析 ID
+        let id = text;
+        if (text.includes("id=")) {
+            id = text.split("id=")[1].split("&")[0];
         }
 
-        if (id === lastResult) return;
-
         isProcessing = true;
-        lastResult = id;
-        updateStatus("⏳ 正在驗證：" + id, "wait");
-        
+        updateStatus("⏳ 驗證中：" + id, "wait");
         verifyTicket(id);
     }
 
     function manualCheck() {
         const val = document.getElementById("manual-input").value.trim();
-        if (!val) return;
-        onScanSuccess(val);
+        if (val) onScanSuccess(val);
     }
 
+    // 3. 連接 GAS
     function verifyTicket(id) {
         fetch(API_URL, {
             method: "POST",
-            mode: "no-cors",
+            mode: "no-cors", // 配合 GAS 的特性
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                "id": id,
-                "token": TOKEN,
-                "action": "verify"
-            })
+            body: new URLSearchParams({ "id": id, "token": TOKEN, "action": "verify" })
         })
         .then(() => {
             okSound.play();
-            updateStatus(`<div class="big">✅ 驗證成功</div><div class="sub">🎫 票號：${id}<br>🎉 祝您參觀愉快！</div>`, "ok");
-            setTimeout(() => { 
-                isProcessing = false; 
-                lastResult = ""; 
-                updateStatus("🔭 正在等待下一張票...", "wait");
-            }, 3500);
+            updateStatus(`<div class="big">✅ 發送成功</div><div class="sub">票號：${id}</div>`, "ok");
+            setTimeout(() => { isProcessing = false; }, 3000);
         })
         .catch(err => {
             errSound.play();
-            updateStatus("<div class="big">📡 連線異常</div><div class="sub">請檢查網路或重新嘗試 🛠️</div>", "err");
+            updateStatus("📡 連線失敗", "err");
             isProcessing = false;
         });
     }
@@ -251,7 +170,7 @@
     function updateStatus(msg, type) {
         statusEl.className = "status " + type;
         statusEl.innerHTML = msg;
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // 酷炫的雙震動
+        if (navigator.vibrate) navigator.vibrate(100);
     }
 </script>
 </body>

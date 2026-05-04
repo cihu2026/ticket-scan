@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎟️ 後慈湖驗票系統</title>
+<title>🎟️ 後慈湖驗票系統 </title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -13,268 +13,270 @@
         --success: #2ecc71;
         --error: #ff6b6b;
         --warning: #f1c40f;
-        --bg: #0a0a0a;
-        --card: #1a1a1a;
-        --accent: #d4af37;
+        --bg: #121212;
+        --card: #1e1e1e;
     }
 
     body {
         margin: 0;
         background: var(--bg);
         color: #fff;
-        font-family: -apple-system, "Noto Sans TC", sans-serif;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
-        padding-bottom: 40px;
+        padding-bottom: 30px;
     }
 
     h2 {
-        margin: 25px 0;
-        letter-spacing: 3px;
+        margin: 20px 0;
+        letter-spacing: 2px;
+        background: linear-gradient(to right, #00d2ff, #3a7bd5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-weight: 800;
-        opacity: 0.9;
-        font-size: 1.2rem;
     }
 
-    /* 掃描器外框 - 更加內斂的質感 */
+    /* 掃描器外框美化 */
     #reader-container {
         position: relative;
-        width: 88%;
-        max-width: 380px;
-        border-radius: 28px;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 24px;
         overflow: hidden;
-        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        border: 2px solid rgba(255,255,255,0.1);
         background: #000;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     }
 
-    #reader { width: 100% !important; border: none !important; }
+    #reader {
+        width: 100% !important;
+        border: none !important;
+    }
 
-    /* 掃描線 */
+    /* 掃描動畫線 */
     .scan-line {
         position: absolute;
-        top: 0; left: 0; width: 100%; height: 2px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
         background: var(--primary);
-        box-shadow: 0 0 10px var(--primary);
-        animation: scan 2.5s linear infinite;
+        box-shadow: 0 0 15px var(--primary);
+        animation: scan 2s linear infinite;
         z-index: 10;
-        display: none;
+        display: none; /* 啟動後顯示 */
     }
-    @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
-    /* 控制按鈕 */
-    .btn-start {
-        width: 88%;
-        max-width: 380px;
+    @keyframes scan {
+        0% { top: 0%; }
+        100% { top: 100%; }
+    }
+
+    /* 控制區佈局 */
+    .controls {
+        width: 90%;
+        max-width: 400px;
         margin-top: 20px;
-        padding: 18px;
-        border-radius: 15px;
-        border: none;
-        background: #fff;
-        color: #000;
-        font-weight: 900;
-        font-size: 1rem;
-        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
-    /* --- 核心狀態卡片 (保留經典側邊條) --- */
-    #status-card {
-        width: 88%;
+    button {
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    #start {
+        background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+    }
+
+    #start:active { transform: scale(0.98); }
+
+    .input-group {
+        display: flex;
+        background: var(--card);
+        border-radius: 12px;
+        padding: 5px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        outline: none;
+        font-size: 16px;
+    }
+
+    .btn-manual {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        padding: 10px 20px;
+    }
+
+    /* 狀態卡片 */
+    #status {
+        width: 85%;
         max-width: 380px;
         margin-top: 25px;
         padding: 25px;
         border-radius: 20px;
         background: var(--card);
-        border-left: 6px solid #333;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+        border-left: 8px solid #444;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    #status-card.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.08); }
-    #status-card.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.08); }
-    #status-card.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.08); }
+    .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.1); }
+    .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.1); }
+    .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.1); }
 
-    .status-msg { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-    .status-sub { font-size: 14px; opacity: 0.5; letter-spacing: 1px; }
-
-    /* --- 微調功能：極簡框框設計 --- */
-    .adjust-box-container {
-        width: 88%;
-        max-width: 380px;
-        margin-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .occupancy-label {
-        font-size: 12px;
-        color: var(--accent);
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-left: 5px;
-    }
-
-    .main-adjust-frame {
-        display: flex;
-        align-items: center;
-        background: var(--card);
-        border-radius: 20px;
-        padding: 10px;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* 左右微調小區塊 */
-    .step-btn {
-        width: 50px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: rgba(255,255,255,0.3);
-        cursor: pointer;
-        user-select: none;
-    }
-    .step-btn:active { color: var(--primary); }
-
-    /* 中間大數字框 */
-    .number-input-frame {
-        flex: 1;
-        text-align: center;
-    }
-
-    .number-input-frame input {
-        width: 100%;
-        background: transparent;
-        border: none;
-        color: #fff;
-        font-size: 2.5rem;
-        font-weight: 200; /* 細體大字最有質感 */
-        text-align: center;
-        outline: none;
-        font-family: 'Courier New', Courier, monospace;
-    }
-
-    .btn-apply-frame {
-        background: var(--accent);
-        color: #000;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: 900;
-        border: none;
-        margin-top: 5px;
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-    }
-
+    .big { font-size: 32px; font-weight: 900; margin-bottom: 5px; }
+    .sub { font-size: 14px; opacity: 0.7; }
 </style>
 </head>
 
 <body>
 
-<h2>後慈湖智慧驗票系統</h2>
+<h2>🎟️ 後慈湖驗票系統 /h2>
 
 <div id="reader-container">
     <div class="scan-line" id="line"></div>
     <div id="reader"></div>
 </div>
 
-<button class="btn-start" id="start" onclick="initScanner()">開啟掃描鏡頭</button>
-
-<!-- 經典狀態卡 -->
-<div id="status-card">
-    <div class="status-msg" id="msg-big">等待掃描</div>
-    <div class="status-sub" id="msg-sub">請將 QR Code 對準相機</div>
+<div class="controls">
+    <button id="start">📷 啟動掃描鏡頭</button>
+    
+    <div class="input-group">
+        <input id="manual" type="text" placeholder="手動輸入票號碼...">
+        <button class="btn-manual" onclick="manualCheck()">驗票</button>
+    </div>
 </div>
 
-<!-- 極簡微調框框 -->
-<div class="adjust-box-container">
-    <div class="occupancy-label">CURRENT OCCUPANCY</div>
-    <div class="main-adjust-frame">
-        <div class="step-btn" onclick="offsetCount(-1)">−</div>
-        <div class="number-input-frame">
-            <input type="number" id="current-count-val" value="0" readonly onclick="makeEditable(this)">
-        </div>
-        <div class="step-btn" onclick="offsetCount(1)">+</div>
-    </div>
-    <button id="apply-btn" class="btn-apply-frame" style="display:none;" onclick="submitManual()">確認更新人數</button>
+<div id="status" class="status">
+    <div class="big">準備就緒</div>
+    <div class="sub">請點擊上方按鈕開啟相機</div>
 </div>
 
 <script>
 const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
+const TOKEN="abc123";
+
 let qr;
-let currentNum = 0;
-let isBusy = false;
+let scanning=false;
+let lastId="";
+let cache=[];
 
-function initScanner() {
-    qr = new Html5Qrcode("reader");
-    document.getElementById("line").style.display = "block";
-    qr.start({facingMode:"environment"}, {fps:25, qrbox:250}, onScanSuccess);
+const okSound=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const errSound=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+
+const statusEl=document.getElementById("status");
+const scanLine=document.getElementById("line");
+
+document.getElementById("start").onclick=()=>{
+    qr=new Html5Qrcode("reader");
+    scanLine.style.display = "block";
+    
+    qr.start(
+        {facingMode:"environment"},
+        {
+            fps:30,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+        },
+        onScan
+    ).catch(err => {
+        show("無法開啟鏡頭", "err");
+    });
+};
+
+function onScan(text){
+    if(scanning) return;
+
+    const id=text.includes("id=")
+        ? text.split("id=")[1].split("&")[0]
+        : text;
+
+    if(id===lastId){
+        show("⚠️ 重複票號","err");
+        errSound.play();
+        return;
+    }
+
+    scanning=true;
+    lastId=id;
+    show("正在驗證票券...","wait");
+
+    send({
+        id:id,
+        action:"verify",
+        token:TOKEN
+    });
 }
 
-function onScanSuccess(text) {
-    if(isBusy) return;
-    isBusy = true;
-    updateUI("驗證中...", "wait");
-    
-    let id = text.includes("id=") ? text.split("id=")[1].split("&")[0] : text;
-    
-    fetch(API, { method: "POST", body: JSON.stringify({id: id, action: "verify"}) })
-    .then(r => r.json())
-    .then(res => {
-        isBusy = false;
-        if(res.ok) {
-            currentNum = res.current || (currentNum + 1);
-            updateUI("驗證通過", "ok");
-            syncDisplay();
-        } else {
-            updateUI("無效票券", "err");
+function manualCheck(){
+    let val=document.getElementById("manual").value.trim();
+    if(!val) return;
+    onScan(val);
+}
+
+function send(data){
+    fetch(API,{
+        method:"POST",
+        body:JSON.stringify(data)
+    })
+    .then(r=> r.json())
+    .then(res=>{
+        if(!res.ok){
+            show("🚫 驗票失敗<br><small>此票券無效</small>","err");
+            errSound.play();
+            scanning=false;
+            return;
         }
-    }).catch(() => { isBusy = false; updateUI("連線異常", "wait"); });
+        okSound.play();
+        show(`
+            <div class="big">✅ 驗證通過</div>
+            <div style="font-size:20px">目前場內：${res.current || 0} 人</div>
+        `,"ok");
+        scanning=false;
+        flushCache();
+    })
+    .catch(()=>{
+        cache.push(data);
+        show("📡 離線模式：已暫存資料","wait");
+        scanning=false;
+    });
 }
 
-function updateUI(text, statusClass) {
-    const card = document.getElementById("status-card");
-    const msg = document.getElementById("msg-big");
-    card.className = statusClass;
-    msg.innerText = text;
-    if(navigator.vibrate) navigator.vibrate(statusClass === 'ok' ? 60 : 150);
+function flushCache(){
+    if(cache.length===0) return;
+    let temp=[...cache];
+    cache=[];
+    temp.forEach(d=>send(d));
 }
 
-// 人數顯示與同步
-function syncDisplay() {
-    document.getElementById("current-count-val").value = currentNum;
+function show(msg,type){
+    statusEl.className="status "+type;
+    statusEl.innerHTML=msg;
+    if(navigator.vibrate) navigator.vibrate(80);
 }
-
-function offsetCount(n) {
-    currentNum = Math.max(0, currentNum + n);
-    syncDisplay();
-    sendSync();
-}
-
-// 點擊框框變為可編輯模式
-function makeEditable(el) {
-    el.readOnly = false;
-    el.style.color = "var(--accent)";
-    document.getElementById("apply-btn").style.display = "block";
-}
-
-function submitManual() {
-    const el = document.getElementById("current-count-val");
-    currentNum = parseInt(el.value) || 0;
-    el.readOnly = true;
-    el.style.color = "#fff";
-    document.getElementById("apply-btn").style.display = "none";
-    sendSync();
-}
-
-function sendSync() {
-    fetch(API, { method: "POST", mode: "no-cors", body: JSON.stringify({action: "sync", count: currentNum}) });
-}
-
 </script>
 
 </body>

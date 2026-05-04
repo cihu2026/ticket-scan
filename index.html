@@ -2,9 +2,8 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<title>🎟️ 後慈湖驗票系統 FINAL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎟️ 後慈湖驗票系統 v4.5</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -15,7 +14,7 @@
     --error:#ff6b6b;
     --warning:#f1c40f;
     --bg:#0f172a;
-    --glass:rgba(255,255,255,0.06);
+    --glass:rgba(255,255,255,0.08);
     --gold:#d4af37;
 }
 
@@ -27,6 +26,7 @@ body{
     display:flex;
     flex-direction:column;
     align-items:center;
+    min-height: 100vh;
 }
 
 h2{
@@ -38,13 +38,15 @@ h2{
     -webkit-text-fill-color:transparent;
 }
 
-/* 掃描區 /
+/* 掃描區 */
 #reader-container{
+    position:relative;
     width:90%;
     max-width:420px;
     border-radius:24px;
     overflow:hidden;
     background:#000;
+    border: 2px solid rgba(255,255,255,0.1);
 }
 
 .scan-line{
@@ -52,8 +54,10 @@ h2{
     width:100%;
     height:3px;
     background:var(--primary);
+    box-shadow: 0 0 10px var(--primary);
     animation:scan 2s linear infinite;
     display:none;
+    z-index: 10;
 }
 
 @keyframes scan{
@@ -61,26 +65,29 @@ h2{
     100%{top:100%}
 }
 
-/ 控制 /
+/* 控制區 */
 .controls{
     width:90%;
     max-width:420px;
     margin-top:15px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
 }
 
 button{
     border:none;
-    border-radius:14px;
+    border-radius:12px;
     padding:14px;
     font-weight:800;
+    cursor:pointer;
+    transition: 0.2s;
 }
 
 #start{
     background:linear-gradient(135deg,#00d2ff,#3a7bd5);
     color:#fff;
+    font-size: 1.1rem;
 }
 
 .input-group{
@@ -88,6 +95,7 @@ button{
     background:var(--glass);
     border-radius:12px;
     padding:5px;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 input{
@@ -96,51 +104,79 @@ input{
     border:none;
     color:#fff;
     padding:10px;
+    font-size: 16px;
+    outline: none;
 }
 
-/ 狀態 /
+/* 狀態卡片 */
 #status{
     width:90%;
     max-width:400px;
     margin-top:20px;
     padding:20px;
-    border-radius:20px;
+    border-radius:24px;
     background:var(--glass);
     text-align:center;
-    border-left:6px solid #333;
+    border-left:8px solid #333;
+    box-sizing: border-box;
 }
 
-.status.ok{border-color:var(--success)}
-.status.err{border-color:var(--error)}
-.status.wait{border-color:var(--warning)}
+.status.ok{border-color:var(--success); background: rgba(46, 204, 113, 0.1);}
+.status.err{border-color:var(--error); background: rgba(255, 107, 107, 0.1);}
+.status.wait{border-color:var(--warning); background: rgba(241, 196, 15, 0.1);}
 
-.big{font-size:30px;font-weight:900}
+.big{font-size:32px;font-weight:900; margin-bottom: 10px;}
 
-/ 人數 /
+/* 人數微調 (➕➖) */
 .counter{
-    margin-top:15px;
+    margin: 15px 0;
     display:flex;
     justify-content:center;
-    gap:20px;
+    align-items: center;
+    gap: 25px;
 }
 
 .btn-adj{
-    width:50px;height:50px;
+    width:55px;
+    height:55px;
     border-radius:50%;
     background:var(--gold);
+    color: #000;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/ 輸入調整 /
+#count{font-size: 28px; font-weight: 800; color: var(--gold); min-width: 100px;}
+
+/* 🔢 快速數值調整輸入區 */
+.adjust-panel {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
 .adjust-box{
-    margin-top:10px;
     display:flex;
-    gap:10px;
+    gap:8px;
     justify-content:center;
 }
 
 .adjust-box input{
-    width:120px;
+    width:100px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
     text-align:center;
+    font-size: 18px;
+}
+
+.btn-apply {
+    background: var(--gold);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 </style>
 </head>
@@ -155,11 +191,11 @@ input{
 </div>
 
 <div class="controls">
-    <button id="start">📷 開始掃描</button>
+    <button id="start">📷 點擊啟動掃描</button>
 
     <div class="input-group">
-        <input id="manual" placeholder="輸入票號">
-        <button onclick="manualCheck()">驗證</button>
+        <input id="manual" placeholder="⌨️ 手動輸入票號碼">
+        <button onclick="manualCheck()" style="background:var(--primary); color:#000; border-radius: 8px;">驗證</button>
     </div>
 </div>
 
@@ -172,108 +208,124 @@ input{
         <button class="btn-adj" onclick="adjust(1)">➕</button>
     </div>
 
-    <div class="adjust-box">
-        <input id="adjInput" placeholder="+ / -">
-        <button onclick="applyAdjust()">套用</button>
+    <!-- 🔢 快速批量微調區 -->
+    <div class="adjust-panel">
+        <div style="font-size: 14px; opacity: 0.6; margin-bottom: 8px;">批量人數校正 (例: 5 或 -5)</div>
+        <div class="adjust-box">
+            <input type="number" id="adjInput" placeholder="🔢 數字">
+            <button class="btn-apply" onclick="applyAdjust()">套用調整</button>
+        </div>
     </div>
 </div>
 
 <script>
 const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
-let qr,lastId="",count=0,cache=[],history=[];
+let qr;
+let lastId="";
+let count=0;
+let cache=[];
+let history=[];
+
 let lastScanTime=0;
-const DELAY=1200;
+const DELAY=1500;
 
 const msg=document.getElementById("msg");
 const countEl=document.getElementById("count");
 
-/ 啟動掃描 /
+// 啟動掃描
 document.getElementById("start").onclick=()=>{
     qr=new Html5Qrcode("reader");
     document.getElementById("line").style.display="block";
 
-    qr.start({facingMode:"environment"},{fps:30,qrbox:250},onScan)
+    qr.start({facingMode:"environment"},{fps:30,qrbox:250,aspectRatio:1.0},onScan)
     .catch(()=>show("❌ 鏡頭開啟失敗","err"));
 };
 
-/ 掃描 /
+// 掃描回傳
 function onScan(text){
     let now=Date.now();
     if(now-lastScanTime<DELAY) return;
     lastScanTime=now;
 
     let id=text.includes("id=")?text.split("id=")[1].split("&")[0]:text;
-
     if(!id) return;
 
     if(id===lastId){
-        show("⚠️ 重複票","err");
+        show("⚠️ 重複掃描","err");
+        if(navigator.vibrate) navigator.vibrate(200);
         return;
     }
 
     lastId=id;
-    show("🔍 驗證中","wait");
-
-    send({id,action:"verify"});
+    show("🔍 驗證中...","wait");
+    send({id, action:"verify"});
 }
 
-/ 手動 /
 function manualCheck(){
     let v=document.getElementById("manual").value.trim();
     if(v) onScan(v);
 }
 
-/ 傳送 /
 function send(data){
     fetch(API,{method:"POST",body:JSON.stringify(data)})
     .then(r=>r.json())
     .then(res=>{
         if(!res.ok){
-            show("🚫 無效票","err");
+            show("🚫 無效票券","err");
             return;
         }
-
         history.push(data.id);
-
         count = res.current ?? (count+1);
         update();
-
-        show("✅ 通過","ok");
+        show("✅ 驗證通過","ok");
+        if(navigator.vibrate) navigator.vibrate(80);
         flush();
     })
     .catch(()=>{
         cache.push(data);
-        show("📡 離線暫存","wait");
+        show("📡 訊號不穩-已存暫存","wait");
     });
 }
 
-/ ➕➖ /
+// ➖➕ 單筆調整
 function adjust(n){
-    if(n<0 && history.length>0){
-        history.pop();
-    }
     count=Math.max(0,count+n);
     update();
+    syncToBackend();
 }
 
-/ 輸入調整 /
+// 🔢 批量輸入調整 (重點修正)
 function applyAdjust(){
-    let v=parseInt(document.getElementById("adjInput").value);
-    if(isNaN(v)) return;
+    let inputEl = document.getElementById("adjInput");
+    let v = parseInt(inputEl.value);
+    
+    if(isNaN(v)) {
+        alert("請輸入有效的數字");
+        return;
+    }
 
-    count=Math.max(0,count+v);
+    count = Math.max(0, count + v);
     update();
-
-    document.getElementById("adjInput").value="";
+    
+    // 清空輸入框
+    inputEl.value = "";
+    
+    // 震動回饋
+    if(navigator.vibrate) navigator.vibrate(50);
+    
+    syncToBackend();
 }
 
-/ 更新 /
 function update(){
-    countEl.innerText="👥 "+count;
+    countEl.innerText="👥 " + count;
 }
 
-/ 離線補送 /
+// 同步人數到後端
+function syncToBackend(){
+    fetch(API,{method:"POST", body:JSON.stringify({action:"sync", count: count})});
+}
+
 function flush(){
     if(cache.length===0) return;
     let t=[...cache];
@@ -281,7 +333,6 @@ function flush(){
     t.forEach(send);
 }
 
-/ 顯示 */
 function show(t,type){
     document.getElementById("status").className="status "+type;
     msg.innerText=t;

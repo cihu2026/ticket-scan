@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🍃 後慈湖｜智慧驗票系統</title>
+<title>🌲 後慈湖驗票系統</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -14,201 +14,122 @@
         --success: #2ecc71;
         --error: #ff4757;
         --bg: #0f172a;
-        --glass: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.1);
     }
 
     body {
         margin: 0;
-        background: radial-gradient(circle at top right, #1e293b, #020617);
+        background: #020617;
         color: #f1f5f9;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+        font-family: -apple-system, "Noto Sans TC", sans-serif;
         display: flex;
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
-        overflow-x: hidden;
     }
 
-    /* 頂部導航 */
     .header {
         width: 100%;
-        padding: 25px 0;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--glass-border);
+        padding: 20px 0;
+        background: rgba(15, 23, 42, 0.9);
         text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    h2 {
-        margin: 0;
-        font-size: 1.3rem;
-        letter-spacing: 5px;
-        font-weight: 900;
-        background: linear-gradient(to right, #fff, var(--primary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    /* 掃描區域 */
+    /* 掃描區 */
     .scanner-box {
         position: relative;
-        width: 85%;
-        max-width: 380px;
-        margin-top: 30px;
-        border-radius: 35px;
-        padding: 10px;
-        background: var(--glass);
-        border: 1px solid var(--glass-border);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    #reader {
-        width: 100% !important;
-        border-radius: 25px;
-        overflow: hidden;
-        border: none !important;
-    }
-
-    /* 雷射線動畫 */
-    .laser {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%;
-        height: 2px;
-        background: var(--primary);
-        box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
-        z-index: 10;
-        display: none;
-        animation: laserMove 2.5s infinite linear;
-    }
-
-    @keyframes laserMove {
-        0% { top: 5%; opacity: 0; }
-        50% { opacity: 1; }
-        100% { top: 95%; opacity: 0; }
-    }
-
-    /* 主面板 */
-    .panel {
         width: 90%;
         max-width: 400px;
-        margin-top: 25px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
+        margin: 20px 0;
+        border-radius: 25px;
+        overflow: hidden;
+        border: 2px solid rgba(255,255,255,0.1);
     }
 
-    .btn-main {
-        background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-        color: white;
-        padding: 18px;
-        border: none;
-        border-radius: 20px;
-        font-size: 1.1rem;
-        font-weight: 800;
-        box-shadow: 0 15px 30px rgba(0, 210, 255, 0.25);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
+    #reader { width: 100% !important; border: none !important; }
 
-    /* 毛玻璃卡片 */
+    /* 主要卡片區 */
     .card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(30px);
-        border: 1px solid var(--glass-border);
-        border-radius: 35px;
-        padding: 30px 20px;
+        width: 90%;
+        max-width: 400px;
+        background: rgba(30, 41, 59, 0.7);
+        border-radius: 30px;
+        padding: 25px;
+        box-sizing: border-box;
         text-align: center;
-        box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.05);
     }
 
-    #status-msg {
-        font-size: 1.7rem;
-        font-weight: 900;
-        margin-bottom: 25px;
-        transition: 0.3s ease;
-    }
+    #status-msg { font-size: 1.5rem; font-weight: 900; margin-bottom: 15px; }
 
-    /* 人數顯示區 */
-    .count-ui {
+    /* 人數顯示 */
+    .counter-ui {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
+        justify-content: space-around;
+        margin-bottom: 25px;
     }
 
-    .btn-round {
-        width: 60px; height: 60px;
+    .btn-adj {
+        width: 65px; height: 65px;
         border-radius: 50%;
-        border: 1px solid var(--glass-border);
-        background: var(--glass);
+        border: none;
+        background: #334155;
         color: white;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         cursor: pointer;
-        transition: 0.2s;
     }
 
-    .btn-round:active {
-        background: var(--accent);
-        color: #000;
-        transform: scale(0.9);
+    #count-number { font-size: 4rem; font-weight: 200; color: var(--accent); }
+
+    /* 🔢 關鍵修正：加大的微調區 */
+    .adjust-panel {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .count-display {
-        flex: 1;
-    }
-
-    .label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        opacity: 0.5;
-        margin-bottom: 5px;
-    }
-
-    #count-number {
-        font-size: 4rem;
-        font-weight: 200;
-        color: var(--accent);
-        line-height: 1;
-    }
-
-    /* 微調輸入框 */
-    .adjust-group {
+    .adjust-row {
         display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 10px;
+        flex-direction: column; /* 改為垂直排列讓按鈕變大 */
+        gap: 12px;
     }
 
-    .adjust-group input {
-        width: 80px;
-        background: rgba(0,0,0,0.3);
-        border: 1px solid var(--glass-border);
-        border-radius: 12px;
+    .large-input {
+        width: 100%;
+        height: 60px; /* 大框框 */
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--accent);
+        border-radius: 15px;
         color: white;
         text-align: center;
-        font-size: 1.1rem;
+        font-size: 1.8rem; /* 大字體 */
+        font-weight: bold;
         outline: none;
+        box-sizing: border-box;
     }
 
-    .btn-small {
+    .btn-large-apply {
+        width: 100%;
+        height: 60px; /* 大按鈕 */
         background: var(--accent);
         color: #000;
-        padding: 8px 15px;
-        border-radius: 12px;
-        font-weight: 800;
         border: none;
+        border-radius: 15px;
+        font-size: 1.3rem;
+        font-weight: 900;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
-    /* 狀態色彩 */
-    .text-ok { color: var(--success); text-shadow: 0 0 20px rgba(46,204,113,0.4); }
-    .text-err { color: var(--error); text-shadow: 0 0 20px rgba(255,71,87,0.4); }
+    .btn-large-apply:active { transform: scale(0.98); opacity: 0.9; }
+
+    /* 狀態顏色 */
+    .ok { color: var(--success); }
+    .err { color: var(--error); }
 </style>
 </head>
 
@@ -219,28 +140,26 @@
 </div>
 
 <div class="scanner-box">
-    <div class="laser" id="laser"></div>
     <div id="reader"></div>
 </div>
 
-<div class="panel">
-    <button class="btn-main" onclick="startCamera()">📷 啟動相機掃描</button>
-    
-    <div class="card">
-        <div id="status-msg">⏳ 準備就緒</div>
+<div class="card">
+    <div id="status-msg">⏳ 準備就緒</div>
 
-        <div class="count-ui">
-            <button class="btn-round" onclick="adjustCount(-1)">➖</button>
-            <div class="count-display">
-                <div class="label">Current Occupancy</div>
-                <div id="count-number">0</div>
-            </div>
-            <button class="btn-round" onclick="adjustCount(1)">➕</button>
-        </div>
+    <!-- ➕➖ 按鈕 -->
+    <div class="counter-ui">
+        <button class="btn-adj" onclick="changeCount(-1)">➖</button>
+        <div id="count-number">0</div>
+        <button class="btn-adj" onclick="changeCount(1)">➕</button>
+    </div>
 
-        <div class="adjust-group">
-            <input type="number" id="quick-input" placeholder="🔢 0">
-            <button class="btn-small" onclick="quickApply()">套用校正</button>
+    <!-- 加大的套用區域 -->
+    <div class="adjust-panel">
+        <div class="adjust-row">
+            <input type="number" id="quick-input" class="large-input" placeholder="🔢 0">
+            <button class="btn-large-apply" onclick="quickApply()">
+                <span>套用校正人數</span>
+            </button>
         </div>
     </div>
 </div>
@@ -249,76 +168,61 @@
     const API = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
     let html5QrCode;
     let count = 0;
-    let isVerifying = false;
 
-    function startCamera() {
+    // 自動啟動
+    window.onload = () => {
         html5QrCode = new Html5Qrcode("reader");
-        document.getElementById("laser").style.display = "block";
         html5QrCode.start(
             { facingMode: "environment" },
             { fps: 20, qrbox: { width: 250, height: 250 } },
             onScanSuccess
-        ).catch(err => updateStatus("❌ 相機啟動失敗", "text-err"));
-    }
+        );
+    };
 
     function onScanSuccess(decodedText) {
-        if (isVerifying) return;
-        isVerifying = true;
-        
         let id = decodedText.includes("id=") ? decodedText.split("id=")[1].split("&")[0] : decodedText;
+        updateUI("🔍 驗證中...", "");
         
-        updateStatus("🔍 正在驗證票券...", "");
-        
-        fetch(API, {
-            method: "POST",
-            body: JSON.stringify({ id: id, action: "verify" })
-        })
+        fetch(API, { method: "POST", body: JSON.stringify({ id: id, action: "verify" }) })
         .then(r => r.json())
         .then(res => {
             if (res.ok) {
-                updateStatus("✅ 驗證成功", "text-ok");
+                updateUI("✅ 驗證成功", "ok");
                 count = res.current || (count + 1);
-                refreshUI();
+                document.getElementById("count-number").innerText = count;
             } else {
-                updateStatus("🚫 無效票券", "text-err");
+                updateUI("🚫 無效票券", "err");
             }
-            setTimeout(() => { isVerifying = false; }, 2000);
-        })
-        .catch(() => {
-            updateStatus("📡 網路連線異常", "");
-            isVerifying = false;
         });
     }
 
-    function adjustCount(n) {
+    function changeCount(n) {
         count = Math.max(0, count + n);
-        refreshUI();
-        syncCount();
+        document.getElementById("count-number").innerText = count;
+        sync();
     }
 
     function quickApply() {
-        let val = parseInt(document.getElementById("quick-input").value);
+        let el = document.getElementById("quick-input");
+        let val = parseInt(el.value);
         if (!isNaN(val)) {
             count = Math.max(0, count + val);
-            refreshUI();
-            syncCount();
+            document.getElementById("count-number").innerText = count;
+            sync();
         }
-        document.getElementById("quick-input").value = "";
+        el.value = "";
+        // 震動回饋
+        if (navigator.vibrate) navigator.vibrate(50);
     }
 
-    function refreshUI() {
-        document.getElementById("count-number").innerText = count;
+    function updateUI(txt, cls) {
+        const m = document.getElementById("status-msg");
+        m.innerText = txt;
+        m.className = cls;
     }
 
-    function updateStatus(text, className) {
-        const msg = document.getElementById("status-msg");
-        msg.innerText = text;
-        msg.className = className;
-        if (navigator.vibrate) navigator.vibrate(className.includes("ok") ? 60 : 150);
-    }
-
-    function syncCount() {
-        fetch(API, { method: "POST", body: JSON.stringify({ action: "sync", count: count }) });
+    function sync() {
+        fetch(API, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "sync", count: count }) });
     }
 </script>
 

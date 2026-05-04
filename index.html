@@ -2,114 +2,152 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎟️ 後慈湖驗票系統 v4.2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>🎟️ 後慈湖驗票系統 FINAL</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
-    :root {
-        --primary: #00d2ff;
-        --success: #2ecc71;
-        --error: #ff6b6b;
-        --warning: #f1c40f;
-        --bg: #121212;
-        --card: #1e1e1e;
-        --gold: #d4af37;
-    }
+:root{
+    --primary:#00d2ff;
+    --success:#2ecc71;
+    --error:#ff6b6b;
+    --warning:#f1c40f;
+    --bg:#0f172a;
+    --glass:rgba(255,255,255,0.06);
+    --gold:#d4af37;
+}
 
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: #fff;
-        font-family: 'Segoe UI', Roboto, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        padding-bottom: 30px;
-    }
+body{
+    margin:0;
+    background:linear-gradient(180deg,#0f172a,#020617);
+    color:#fff;
+    font-family:"Noto Sans TC",sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
 
-    h2 { margin: 20px 0; letter-spacing: 2px; color: var(--primary); font-weight: 800; }
+h2{
+    margin:20px 0;
+    font-weight:900;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,#00d2ff,#3a7bd5);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
 
-    /* 掃描器 */
-    #reader-container {
-        position: relative;
-        width: 85%;
-        max-width: 400px;
-        border-radius: 24px;
-        overflow: hidden;
-        border: 2px solid rgba(255,255,255,0.1);
-        background: #000;
-    }
+/* 掃描區 /
+#reader-container{
+    width:90%;
+    max-width:420px;
+    border-radius:24px;
+    overflow:hidden;
+    background:#000;
+}
 
-    #reader { width: 100% !important; border: none !important; }
+.scan-line{
+    position:absolute;
+    width:100%;
+    height:3px;
+    background:var(--primary);
+    animation:scan 2s linear infinite;
+    display:none;
+}
 
-    .scan-line {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 4px;
-        background: var(--primary);
-        box-shadow: 0 0 15px var(--primary);
-        animation: scan 2s linear infinite;
-        z-index: 10; display: none;
-    }
+@keyframes scan{
+    0%{top:0}
+    100%{top:100%}
+}
 
-    @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+/ 控制 /
+.controls{
+    width:90%;
+    max-width:420px;
+    margin-top:15px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
 
-    /* 控制區 */
-    .controls { width: 90%; max-width: 400px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+button{
+    border:none;
+    border-radius:14px;
+    padding:14px;
+    font-weight:800;
+}
 
-    button {
-        padding: 16px; border: none; border-radius: 12px;
-        font-size: 16px; font-weight: 700; cursor: pointer;
-        display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
+#start{
+    background:linear-gradient(135deg,#00d2ff,#3a7bd5);
+    color:#fff;
+}
 
-    #start { background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); color: white; width: 100%; }
+.input-group{
+    display:flex;
+    background:var(--glass);
+    border-radius:12px;
+    padding:5px;
+}
 
-    .input-group {
-        display: flex; background: var(--card); border-radius: 12px; padding: 5px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
+input{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:#fff;
+    padding:10px;
+}
 
-    input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
+/ 狀態 /
+#status{
+    width:90%;
+    max-width:400px;
+    margin-top:20px;
+    padding:20px;
+    border-radius:20px;
+    background:var(--glass);
+    text-align:center;
+    border-left:6px solid #333;
+}
 
-    /* 狀態卡片 (主要結果) */
-    #status-card {
-        width: 85%; max-width: 380px; margin-top: 15px; padding: 20px;
-        border-radius: 20px; background: var(--card); text-align: center;
-        border-left: 8px solid #444; transition: 0.3s;
-    }
+.status.ok{border-color:var(--success)}
+.status.err{border-color:var(--error)}
+.status.wait{border-color:var(--warning)}
 
-    .status-ok { border-left-color: var(--success) !important; background: rgba(46, 204, 113, 0.15) !important; }
-    .status-err { border-left-color: var(--error) !important; background: rgba(255, 107, 107, 0.15) !important; }
-    .status-wait { border-left-color: var(--warning) !important; background: rgba(241, 196, 15, 0.15) !important; }
+.big{font-size:30px;font-weight:900}
 
-    .big-text { font-size: 28px; font-weight: 900; margin-bottom: 5px; }
+/ 人數 /
+.counter{
+    margin-top:15px;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+}
 
-    /* 🔢 人數微調區 (獨立區塊) */
-    .counter-box {
-        width: 85%; max-width: 380px; margin-top: 15px;
-        padding: 15px; border-radius: 20px;
-        background: #252525; border: 1px solid var(--gold);
-        display: flex; align-items: center; justify-content: space-around;
-    }
+.btn-adj{
+    width:50px;height:50px;
+    border-radius:50%;
+    background:var(--gold);
+}
 
-    .btn-adj {
-        width: 60px; height: 60px; border-radius: 50%;
-        background: var(--gold); color: #000;
-        font-size: 30px; font-weight: bold; border: none;
-    }
+/ 輸入調整 /
+.adjust-box{
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}
 
-    .btn-adj:active { transform: scale(0.9); background: #b8962d; }
-
-    #people-display { font-size: 24px; font-weight: 800; color: var(--gold); }
+.adjust-box input{
+    width:120px;
+    text-align:center;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🎟️ 後慈湖驗票 🌲</h2>
+<h2>🎟️ 後慈湖驗票系統</h2>
 
 <div id="reader-container">
     <div class="scan-line" id="line"></div>
@@ -117,113 +155,136 @@
 </div>
 
 <div class="controls">
-    <button id="start">📷 啟動掃描鏡頭</button>
+    <button id="start">📷 開始掃描</button>
+
     <div class="input-group">
-        <input id="manual" type="text" placeholder="⌨️ 手動輸入票號...">
-        <button onclick="manualCheck()" style="background:var(--primary); color:black; border-radius:8px; padding:5px 15px; border:none; font-weight:bold;">驗證</button>
+        <input id="manual" placeholder="輸入票號">
+        <button onclick="manualCheck()">驗證</button>
     </div>
 </div>
 
-<!-- 驗票狀態顯示區 -->
-<div id="status-card">
-    <div class="big-text" id="status-msg">⏳ 準備就緒</div>
-    <div id="status-sub">Ready to check</div>
-</div>
+<div id="status" class="status">
+    <div id="msg" class="big">⏳ 準備就緒</div>
 
-<!-- 🔢 人數微調區 (保證可以點擊) -->
-<div class="counter-box">
-    <button class="btn-adj" onclick="adjustCount(-1)">➖</button>
-    <div id="people-display">👥 0 人</div>
-    <button class="btn-adj" onclick="adjustCount(1)">➕</button>
+    <div class="counter">
+        <button class="btn-adj" onclick="adjust(-1)">➖</button>
+        <div id="count">👥 0</div>
+        <button class="btn-adj" onclick="adjust(1)">➕</button>
+    </div>
+
+    <div class="adjust-box">
+        <input id="adjInput" placeholder="+ / -">
+        <button onclick="applyAdjust()">套用</button>
+    </div>
 </div>
 
 <script>
 const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
-const TOKEN="abc123";
 
-let qr;
-let scanning=false;
-let lastId="";
-let globalCount = 0; // 儲存人數的變數
+let qr,lastId="",count=0,cache=[],history=[];
+let lastScanTime=0;
+const DELAY=1200;
 
-const okSound=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-const errSound=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+const msg=document.getElementById("msg");
+const countEl=document.getElementById("count");
 
-// 啟動相機
+/ 啟動掃描 /
 document.getElementById("start").onclick=()=>{
     qr=new Html5Qrcode("reader");
-    document.getElementById("line").style.display = "block";
-    qr.start({facingMode:"environment"}, {fps:30, qrbox: 250}, onScan);
+    document.getElementById("line").style.display="block";
+
+    qr.start({facingMode:"environment"},{fps:30,qrbox:250},onScan)
+    .catch(()=>show("❌ 鏡頭開啟失敗","err"));
 };
 
-// 掃描邏輯
+/ 掃描 /
 function onScan(text){
-    if(scanning) return;
-    const id=text.includes("id=")? text.split("id=")[1].split("&")[0] : text;
+    let now=Date.now();
+    if(now-lastScanTime<DELAY) return;
+    lastScanTime=now;
+
+    let id=text.includes("id=")?text.split("id=")[1].split("&")[0]:text;
+
+    if(!id) return;
+
     if(id===lastId){
-        updateStatus("⚠️ 重複票號", "此張票券已掃過", "err");
-        errSound.play();
+        show("⚠️ 重複票","err");
         return;
     }
-    scanning=true;
+
     lastId=id;
-    updateStatus("🔍 驗證中...", "正在連線資料庫", "wait");
-    send({id:id, action:"verify", token:TOKEN});
+    show("🔍 驗證中","wait");
+
+    send({id,action:"verify"});
 }
 
+/ 手動 /
 function manualCheck(){
-    let val=document.getElementById("manual").value.trim();
-    if(val) onScan(val);
+    let v=document.getElementById("manual").value.trim();
+    if(v) onScan(v);
 }
 
-// 🟢 正確的人數調整函式
-function adjustCount(offset) {
-    globalCount = Math.max(0, globalCount + offset); // 不讓它變成負數
-    document.getElementById("people-display").innerText = `👥 ${globalCount} 人`;
-    
-    // 同步到 Google 試算表
-    fetch(API, {
-        method: "POST",
-        mode: "no-cors", // 避免跨網域問題
-        body: JSON.stringify({action:"sync", count: globalCount, token:TOKEN})
-    });
-}
-
+/ 傳送 /
 function send(data){
-    fetch(API,{method:"POST", body:JSON.stringify(data)})
-    .then(r=> r.json())
+    fetch(API,{method:"POST",body:JSON.stringify(data)})
+    .then(r=>r.json())
     .then(res=>{
         if(!res.ok){
-            updateStatus("🚫 驗票失敗", "無效票券或已過期", "err");
-            errSound.play();
-            scanning=false; return;
+            show("🚫 無效票","err");
+            return;
         }
-        okSound.play();
-        
-        // 更新全域人數
-        globalCount = res.current || 0;
-        document.getElementById("people-display").innerText = `👥 ${globalCount} 人`;
-        
-        updateStatus("✅ 驗證通過", "歡迎光臨後慈湖", "ok");
-        scanning=false;
+
+        history.push(data.id);
+
+        count = res.current ?? (count+1);
+        update();
+
+        show("✅ 通過","ok");
+        flush();
     })
     .catch(()=>{
-        updateStatus("📡 離線模式", "已記錄至手機暫存", "wait");
-        scanning=false;
+        cache.push(data);
+        show("📡 離線暫存","wait");
     });
 }
 
-// 更新 UI 狀態
-function updateStatus(msg, sub, type){
-    const card = document.getElementById("status-card");
-    const msgEl = document.getElementById("status-msg");
-    const subEl = document.getElementById("status-sub");
-    
-    card.className = "status-" + type; // 切換 CSS class (status-ok, status-err...)
-    msgEl.innerText = msg;
-    subEl.innerText = sub;
-    
-    if(navigator.vibrate) navigator.vibrate(type==='ok'? 80 : 200);
+/ ➕➖ /
+function adjust(n){
+    if(n<0 && history.length>0){
+        history.pop();
+    }
+    count=Math.max(0,count+n);
+    update();
+}
+
+/ 輸入調整 /
+function applyAdjust(){
+    let v=parseInt(document.getElementById("adjInput").value);
+    if(isNaN(v)) return;
+
+    count=Math.max(0,count+v);
+    update();
+
+    document.getElementById("adjInput").value="";
+}
+
+/ 更新 /
+function update(){
+    countEl.innerText="👥 "+count;
+}
+
+/ 離線補送 /
+function flush(){
+    if(cache.length===0) return;
+    let t=[...cache];
+    cache=[];
+    t.forEach(send);
+}
+
+/ 顯示 */
+function show(t,type){
+    document.getElementById("status").className="status "+type;
+    msg.innerText=t;
 }
 </script>
 

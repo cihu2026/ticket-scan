@@ -1,283 +1,245 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🎟️ 後慈湖驗票系統 </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎟️ 後慈湖驗票系統</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --success: #2ecc71;
+            --error: #ff6b6b;
+            --warning: #f1c40f;
+            --bg: #121212;
+            --card: #1e1e1e;
+        }
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 30px;
+        }
 
-<style>
-    :root {
-        --primary: #00d2ff;
-        --success: #2ecc71;
-        --error: #ff6b6b;
-        --warning: #f1c40f;
-        --bg: #121212;
-        --card: #1e1e1e;
-    }
+        h2 {
+            margin: 20px 0;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
 
-    body {
-        margin: 0;
-        background: var(--bg);
-        color: #fff;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        padding-bottom: 30px;
-    }
+        #reader-container {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.1);
+            background: #000;
+        }
 
-    h2 {
-        margin: 20px 0;
-        letter-spacing: 2px;
-        background: linear-gradient(to right, #00d2ff, #3a7bd5);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 800;
-    }
+        #reader { width: 100% !important; border: none !important; }
 
-    /* 掃描器外框美化 */
-    #reader-container {
-        position: relative;
-        width: 90%;
-        max-width: 400px;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        border: 2px solid rgba(255,255,255,0.1);
-        background: #000;
-    }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+            animation: scan 2s linear infinite;
+            z-index: 10;
+            display: none;
+        }
 
-    #reader {
-        width: 100% !important;
-        border: none !important;
-    }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
-    /* 掃描動畫線 */
-    .scan-line {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: var(--primary);
-        box-shadow: 0 0 15px var(--primary);
-        animation: scan 2s linear infinite;
-        z-index: 10;
-        display: none; /* 啟動後顯示 */
-    }
+        .controls {
+            width: 90%;
+            max-width: 400px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-    @keyframes scan {
-        0% { top: 0%; }
-        100% { top: 100%; }
-    }
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-    /* 控制區佈局 */
-    .controls {
-        width: 90%;
-        max-width: 400px;
-        margin-top: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
+        #start-btn {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        }
 
-    button {
-        padding: 16px;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
+        .input-group {
+            display: flex;
+            background: var(--card);
+            border-radius: 12px;
+            padding: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
 
-    #start {
-        background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-    }
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            outline: none;
+            font-size: 16px;
+        }
 
-    #start:active { transform: scale(0.98); }
+        .btn-manual { background: rgba(255,255,255,0.1); color: white; padding: 10px 20px; }
 
-    .input-group {
-        display: flex;
-        background: var(--card);
-        border-radius: 12px;
-        padding: 5px;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
+        #status {
+            width: 85%;
+            max-width: 380px;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 20px;
+            background: var(--card);
+            border-left: 8px solid #444;
+            transition: all 0.3s ease;
+        }
 
-    input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        color: white;
-        padding: 10px 15px;
-        outline: none;
-        font-size: 16px;
-    }
+        .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.1); }
+        .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.1); }
+        .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.1); }
 
-    .btn-manual {
-        background: rgba(255,255,255,0.1);
-        color: white;
-        padding: 10px 20px;
-    }
-
-    /* 狀態卡片 */
-    #status {
-        width: 85%;
-        max-width: 380px;
-        margin-top: 25px;
-        padding: 25px;
-        border-radius: 20px;
-        background: var(--card);
-        backdrop-filter: blur(10px);
-        border-left: 8px solid #444;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.1); }
-    .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.1); }
-    .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.1); }
-
-    .big { font-size: 32px; font-weight: 900; margin-bottom: 5px; }
-    .sub { font-size: 14px; opacity: 0.7; }
-</style>
+        .big { font-size: 28px; font-weight: 900; margin-bottom: 5px; }
+        .sub { font-size: 14px; opacity: 0.7; }
+    </style>
 </head>
-
 <body>
 
-<h2>🎟️ 後慈湖驗票系統 /h2>
+    <h2>🎟️ 後慈湖驗票系統</h2>
 
-<div id="reader-container">
-    <div class="scan-line" id="line"></div>
-    <div id="reader"></div>
-</div>
-
-<div class="controls">
-    <button id="start">📷 啟動掃描鏡頭</button>
-    
-    <div class="input-group">
-        <input id="manual" type="text" placeholder="手動輸入票號碼...">
-        <button class="btn-manual" onclick="manualCheck()">驗票</button>
+    <div id="reader-container">
+        <div class="scan-line" id="line"></div>
+        <div id="reader"></div>
     </div>
-</div>
 
-<div id="status" class="status">
-    <div class="big">準備就緒</div>
-    <div class="sub">請點擊上方按鈕開啟相機</div>
-</div>
+    <div class="controls">
+        <button id="start-btn">📷 啟動掃描鏡頭</button>
+        <div class="input-group">
+            <input id="manual-input" type="text" placeholder="手動輸入票號碼...">
+            <button class="btn-manual" onclick="manualCheck()">驗票</button>
+        </div>
+    </div>
+
+    <div id="status" class="status">
+        <div class="big">準備就緒</div>
+        <div class="sub">請點擊上方按鈕開啟相機</div>
+    </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
-const TOKEN="abc123";
+    const API_URL = "你的_GAS_部署網址"; // 請替換成實際網址
+    const TOKEN = "abc123";
 
-let qr;
-let scanning=false;
-let lastId="";
-let cache=[];
+    let html5QrCode;
+    let isProcessing = false;
+    let lastResult = "";
 
-const okSound=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-const errSound=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+    const okSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+    const errSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
-const statusEl=document.getElementById("status");
-const scanLine=document.getElementById("line");
+    const statusEl = document.getElementById("status");
+    const scanLine = document.getElementById("line");
 
-document.getElementById("start").onclick=()=>{
-    qr=new Html5Qrcode("reader");
-    scanLine.style.display = "block";
-    
-    qr.start(
-        {facingMode:"environment"},
-        {
-            fps:30,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
-        },
-        onScan
-    ).catch(err => {
-        show("無法開啟鏡頭", "err");
-    });
-};
+    document.getElementById("start-btn").onclick = function() {
+        if (html5QrCode) return; // 防止重複初始化
+        
+        html5QrCode = new Html5Qrcode("reader");
+        scanLine.style.display = "block";
+        
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 20, qrbox: { width: 250, height: 250 } },
+            onScanSuccess
+        ).catch(err => {
+            updateStatus("無法開啟鏡頭", "err");
+            console.error(err);
+        });
+    };
 
-function onScan(text){
-    if(scanning) return;
+    function onScanSuccess(decodedText) {
+        if (isProcessing) return;
 
-    const id=text.includes("id=")
-        ? text.split("id=")[1].split("&")[0]
-        : text;
+        // 解析 URL 參數或直接讀取文本
+        let id = decodedText;
+        if (decodedText.includes("id=")) {
+            const urlParams = new URLSearchParams(decodedText.split('?')[1]);
+            id = urlParams.get('id');
+        }
 
-    if(id===lastId){
-        show("⚠️ 重複票號","err");
-        errSound.play();
-        return;
+        if (id === lastResult) return; // 避免對同一張票重複發送請求
+
+        isProcessing = true;
+        lastResult = id;
+        updateStatus("正在驗證：" + id, "wait");
+        
+        verifyTicket(id);
     }
 
-    scanning=true;
-    lastId=id;
-    show("正在驗證票券...","wait");
+    function manualCheck() {
+        const val = document.getElementById("manual-input").value.trim();
+        if (!val) return;
+        onScanSuccess(val);
+    }
 
-    send({
-        id:id,
-        action:"verify",
-        token:TOKEN
-    });
-}
-
-function manualCheck(){
-    let val=document.getElementById("manual").value.trim();
-    if(!val) return;
-    onScan(val);
-}
-
-function send(data){
-    fetch(API,{
-        method:"POST",
-        body:JSON.stringify(data)
-    })
-    .then(r=> r.json())
-    .then(res=>{
-        if(!res.ok){
-            show("🚫 驗票失敗<br><small>此票券無效</small>","err");
+    function verifyTicket(id) {
+        // 使用 POST 傳送資料到 GAS
+        fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors", // 注意：GAS POST 經常需要 no-cors，但這會拿不到 Response body
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+                "id": id,
+                "token": TOKEN,
+                "action": "verify"
+            })
+        })
+        .then(() => {
+            // 因為 no-cors 模式無法讀取 JSON 回傳值，建議 GAS 端若驗證成功則直接運作
+            // 若需要解析回傳 JSON，GAS 必須處理 OPTIONS 預檢請求或使用 JSONP (較複雜)
+            okSound.play();
+            updateStatus(`<div class="big">✅ 發送成功</div><div class="sub">票號：${id}</div>`, "ok");
+            setTimeout(() => { isProcessing = false; lastResult = ""; }, 3000);
+        })
+        .catch(err => {
             errSound.play();
-            scanning=false;
-            return;
-        }
-        okSound.play();
-        show(`
-            <div class="big">✅ 驗證通過</div>
-            <div style="font-size:20px">目前場內：${res.current || 0} 人</div>
-        `,"ok");
-        scanning=false;
-        flushCache();
-    })
-    .catch(()=>{
-        cache.push(data);
-        show("📡 離線模式：已暫存資料","wait");
-        scanning=false;
-    });
-}
+            updateStatus("📡 連線失敗", "err");
+            isProcessing = false;
+        });
+    }
 
-function flushCache(){
-    if(cache.length===0) return;
-    let temp=[...cache];
-    cache=[];
-    temp.forEach(d=>send(d));
-}
-
-function show(msg,type){
-    statusEl.className="status "+type;
-    statusEl.innerHTML=msg;
-    if(navigator.vibrate) navigator.vibrate(80);
-}
+    function updateStatus(msg, type) {
+        statusEl.className = "status " + type;
+        statusEl.innerHTML = msg;
+        if (navigator.vibrate) navigator.vibrate(80);
+    }
 </script>
-
 </body>
 </html>

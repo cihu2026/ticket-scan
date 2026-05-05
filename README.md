@@ -1,9 +1,3 @@
-這是一個設計相當完整且具備實戰能力的 **後慈湖驗票系統 Turbo**。該系統採用了現代化的行動優先（Mobile-First）設計，結合了 QR Code 掃描、手動補票以及後台連動（Google Apps Script）功能。
-
-以下是為你撰寫的 `README.md`，內容涵蓋了功能亮點、安裝方式、以及技術細節，這能幫助其他開發者或管理員快速上手。
-
----
-
 # 🎟️ 後慈湖驗票系統 Turbo (Back Cihu Ticketing System)
 
 這是一個專為後慈湖導覽設計的輕量化、高響應式 **前端驗票介面**。系統採用 `html5-qrcode` 庫，支援手機鏡頭掃描 QR Code 並即時與 Google Sheets 後端同步進場人數與票價分類。

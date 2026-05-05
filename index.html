@@ -1,171 +1,162 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎟️ 後慈湖智慧驗票系統</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        :root {
-            --primary: #00d2ff;
-            --secondary: #3a7bd5;
-            --success: #2ecc71;
-            --error: #ff6b6b;
-            --warning: #f1c40f;
-            --bg: #0f172a;
-            --card: rgba(30, 41, 59, 0.7);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎟️ 後慈湖驗票系統 </title>
 
-        body {
-            margin: 0;
-            background: radial-gradient(circle at top right, #1e293b, #0f172a);
-            color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-        h2 {
-            margin: 10px 0 25px 0;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, var(--primary), #92fe9d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            filter: drop-shadow(0 2px 8px rgba(0,210,255,0.3));
-        }
+<style>
+    :root {
+        --primary: #00d2ff;
+        --success: #2ecc71;
+        --error: #ff6b6b;
+        --warning: #f1c40f;
+        --bg: #121212;
+        --card: #1e1e1e;
+    }
 
-        /* 掃描器容器 */
-        #reader-container {
-            position: relative;
-            width: 100%;
-            max-width: 380px;
-            aspect-ratio: 1/1;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
-            background: #000;
-        }
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: #fff;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding-bottom: 30px;
+    }
 
-        /* 準心裝飾 */
-        .corner {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            border: 4px solid var(--primary);
-            z-index: 11;
-            pointer-events: none;
-        }
-        .tl { top: 20px; left: 20px; border-right: 0; border-bottom: 0; border-radius: 8px 0 0 0; }
-        .tr { top: 20px; right: 20px; border-left: 0; border-bottom: 0; border-radius: 0 8px 0 0; }
-        .bl { bottom: 20px; left: 20px; border-right: 0; border-top: 0; border-radius: 0 0 0 8px; }
-        .br { bottom: 20px; right: 20px; border-left: 0; border-top: 0; border-radius: 0 0 8px 0; }
+    h2 {
+        margin: 20px 0;
+        letter-spacing: 2px;
+        background: linear-gradient(to right, #00d2ff, #3a7bd5);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
 
-        #reader { width: 100% !important; height: 100% !important; border: none !important; }
+    /* 掃描器外框美化 */
+    #reader-container {
+        position: relative;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        border: 2px solid rgba(255,255,255,0.1);
+        background: #000;
+    }
 
-        .scan-line {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            box-shadow: 0 0 15px var(--primary);
-            animation: scan 2s linear infinite;
-            z-index: 10;
-            display: none;
-        }
+    #reader {
+        width: 100% !important;
+        border: none !important;
+    }
 
-        @keyframes scan { 0% { top: 10%; } 100% { top: 90%; } }
+    /* 掃描動畫線 */
+    .scan-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary);
+        box-shadow: 0 0 15px var(--primary);
+        animation: scan 2s linear infinite;
+        z-index: 10;
+        display: none; /* 啟動後顯示 */
+    }
 
-        /* 控制區 */
-        .controls {
-            width: 100%;
-            max-width: 380px;
-            margin-top: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    @keyframes scan {
+        0% { top: 0%; }
+        100% { top: 100%; }
+    }
 
-        button {
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+    /* 控制區佈局 */
+    .controls {
+        width: 90%;
+        max-width: 400px;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-        #start {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
-        }
+    button {
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-        #start:active { transform: scale(0.96); }
+    #start {
+        background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+    }
 
-        .input-group {
-            display: flex;
-            background: var(--card);
-            border-radius: 14px;
-            padding: 5px;
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
+    #start:active { transform: scale(0.98); }
 
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            outline: none;
-            font-size: 16px;
-        }
+    .input-group {
+        display: flex;
+        background: var(--card);
+        border-radius: 12px;
+        padding: 5px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
 
-        .btn-manual {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 10px 20px;
-        }
+    input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        outline: none;
+        font-size: 16px;
+    }
 
-        /* 狀態卡片 */
-        #status {
-            width: 100%;
-            max-width: 380px;
-            margin-top: 25px;
-            padding: 22px;
-            border-radius: 24px;
-            background: var(--card);
-            backdrop-filter: blur(10px);
-            border-left: 10px solid #444;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-sizing: border-box;
-        }
+    .btn-manual {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        padding: 10px 20px;
+    }
 
-        .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.15); }
-        .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.15); }
-        .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.15); }
+    /* 狀態卡片 */
+    #status {
+        width: 85%;
+        max-width: 380px;
+        margin-top: 25px;
+        padding: 25px;
+        border-radius: 20px;
+        background: var(--card);
+        backdrop-filter: blur(10px);
+        border-left: 8px solid #444;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-        .big { font-size: 28px; font-weight: 900; margin-bottom: 5px; }
-        .sub { font-size: 15px; opacity: 0.8; }
-    </style>
+    .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.1); }
+    .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.1); }
+    .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.1); }
+
+    .big { font-size: 32px; font-weight: 900; margin-bottom: 5px; }
+    .sub { font-size: 14px; opacity: 0.7; }
+</style>
 </head>
 
 <body>
 
-<h2>🎟️ 後慈湖智慧驗票</h2>
+<h2>🎟️ 後慈湖驗票系統 /h2>
 
 <div id="reader-container">
-    <div class="corner tl"></div><div class="corner tr"></div>
-    <div class="corner bl"></div><div class="corner br"></div>
     <div class="scan-line" id="line"></div>
     <div id="reader"></div>
 </div>
@@ -181,11 +172,10 @@
 
 <div id="status" class="status">
     <div class="big">準備就緒</div>
-    <div class="sub">請確保連網環境並點擊啟動按鈕</div>
+    <div class="sub">請點擊上方按鈕開啟相機</div>
 </div>
 
 <script>
-// --- [保留核心微調邏輯] ---
 const API="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 const TOKEN="abc123";
 
@@ -200,100 +190,91 @@ const errSound=new Audio("https://actions.google.com/sounds/v1/alarms/beep_short
 const statusEl=document.getElementById("status");
 const scanLine=document.getElementById("line");
 
-// 啟動按鈕
 document.getElementById("start").onclick=()=>{
-    qr = new Html5Qrcode("reader");
+    qr=new Html5Qrcode("reader");
     scanLine.style.display = "block";
     
     qr.start(
         {facingMode:"environment"},
         {
-            fps:25,
+            fps:30,
             qrbox: { width: 250, height: 250 },
             aspectRatio: 1.0
         },
         onScan
-    ).then(() => {
-        document.getElementById("start").innerText = "🟢 掃描器運行中";
-        show("🚀 請對準 QR Code", "ok");
-    }).catch(err => {
-        show("❌ 無法開啟相機", "err");
+    ).catch(err => {
+        show("無法開啟鏡頭", "err");
     });
 };
 
-// 掃描回調
 function onScan(text){
     if(scanning) return;
 
-    // 解析 ID
-    const id = text.includes("id=") 
-        ? text.split("id=")[1].split("&")[0] 
+    const id=text.includes("id=")
+        ? text.split("id=")[1].split("&")[0]
         : text;
 
-    // 保留重複擋刷邏輯
-    if(id === lastId){
-        show("⚠️ 此票號重複掃描","err");
+    if(id===lastId){
+        show("⚠️ 重複票號","err");
         errSound.play();
         return;
     }
 
-    scanning = true;
-    lastId = id;
-    show("⌛ 正在驗證票券...","wait");
+    scanning=true;
+    lastId=id;
+    show("正在驗證票券...","wait");
 
     send({
-        id: id,
-        action: "verify",
-        token: TOKEN
+        id:id,
+        action:"verify",
+        token:TOKEN
     });
 }
 
-// 手動輸入
 function manualCheck(){
     let val=document.getElementById("manual").value.trim();
     if(!val) return;
     onScan(val);
 }
 
-// 保留發送與快取邏輯
 function send(data){
     fetch(API,{
         method:"POST",
-        mode: "no-cors", // 注意：no-cors 無法獲取 res.json()，若 GAS 支援 CORS 建議移除
-        body: JSON.stringify(data)
+        body:JSON.stringify(data)
     })
-    .then(() => {
-        // 因應 no-cors 特性，此處假設 POST 成功即為驗證成功
-        // 若要精確解析 res.ok，GAS 必須回傳 CORS Header 且前端移除 no-cors
+    .then(r=> r.json())
+    .then(res=>{
+        if(!res.ok){
+            show("🚫 驗票失敗<br><small>此票券無效</small>","err");
+            errSound.play();
+            scanning=false;
+            return;
+        }
         okSound.play();
         show(`
-            <div class="big">✅ 發送成功</div>
-            <div class="sub">票號：${data.id}</div>
+            <div class="big">✅ 驗證通過</div>
+            <div style="font-size:20px">目前場內：${res.current || 0} 人</div>
         `,"ok");
-        
-        // 成功後清理暫存並恢復掃描
-        setTimeout(() => { scanning = false; }, 2000); 
+        scanning=false;
         flushCache();
     })
     .catch(()=>{
-        // 保留離線暫存邏輯
         cache.push(data);
-        show("📡 網路異常：已存入暫存區","wait");
-        scanning = false;
+        show("📡 離線模式：已暫存資料","wait");
+        scanning=false;
     });
 }
 
-// 保留快取補發邏輯
 function flushCache(){
-    if(cache.length === 0) return;
-    let temp = [...cache];
-    cache = [];
-    temp.forEach(d => send(d));
+    if(cache.length===0) return;
+    let temp=[...cache];
+    cache=[];
+    temp.forEach(d=>send(d));
 }
 
-function show(msg, type){
-    statusEl.className = "status " + type;
-    statusEl.innerHTML = msg;
+function show(msg,type){
+    statusEl.className="status "+type;
+    statusEl.innerHTML=msg;
     if(navigator.vibrate) navigator.vibrate(80);
 }
 </script>

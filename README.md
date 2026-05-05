@@ -77,4 +77,3 @@ const API_URL = "YOUR_GAS_DEPLOYMENT_URL";
 ---
 
 > **開發建議**: 若未來需要處理更複雜的離線需求，建議加入 **Service Worker** 將此網頁轉為 **PWA (Progressive Web App)**，以獲得類原生 App 的體驗。
-```

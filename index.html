@@ -1,245 +1,370 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎟️ 後慈湖驗票系統</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        :root {
-            --primary: #00d2ff;
-            --success: #2ecc71;
-            --error: #ff6b6b;
-            --warning: #f1c40f;
-            --bg: #121212;
-            --card: #1e1e1e;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎟️ 後慈湖驗票系統 Turbo</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-bottom: 30px;
-        }
+<style>
+:root{
+--bg:#121212;
+--card:#1e1e1e;
+--line:#333;
+--blue:#00d2ff;
+--green:#2ecc71;
+--red:#e74c3c;
+--yellow:#f1c40f;
+}
 
-        h2 {
-            margin: 20px 0;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
+*{box-sizing:border-box;}
 
-        #reader-container {
-            position: relative;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255,255,255,0.1);
-            background: #000;
-        }
+body{
+margin:0;
+padding:15px;
+font-family:"Noto Sans TC",sans-serif;
+background:var(--bg);
+color:#fff;
+text-align:center;
+}
 
-        #reader { width: 100% !important; border: none !important; }
+h2{
+margin:12px 0 16px;
+font-size:24px;
+font-weight:900;
+color:var(--blue);
+}
 
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary);
-            box-shadow: 0 0 15px var(--primary);
-            animation: scan 2s linear infinite;
-            z-index: 10;
-            display: none;
-        }
+#reader{
+max-width:500px;
+margin:0 auto 14px;
+border-radius:22px;
+overflow:hidden;
+background:#000;
+border:2px solid #222;
+box-shadow:0 10px 28px rgba(0,0,0,.45);
+}
 
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+#start{
+width:92%;
+max-width:500px;
+padding:17px;
+border:none;
+border-radius:50px;
+font-size:19px;
+font-weight:900;
+color:#fff;
+cursor:pointer;
+background:linear-gradient(135deg,#00d2ff,#3a7bd5);
+margin-bottom: 10px;
+}
 
-        .controls {
-            width: 90%;
-            max-width: 400px;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+.status{
+max-width:500px;
+margin:14px auto;
+padding:18px;
+min-height:72px;
+border-radius:20px;
+background:var(--card);
+border:1px solid var(--line);
+line-height:1.6;
+font-size:16px;
+}
 
-        button {
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+.wait{border:2px solid var(--yellow); color:var(--yellow);}
+.ok{border:2px solid var(--green); background:rgba(46,204,113,.08);}
+.err{border:2px solid var(--red); color:#ff9e9e; background:rgba(231,76,60,.08);}
 
-        #start-btn {
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
-        }
+/* 手動輸入區塊美化 */
+.manual-box {
+    max-width: 500px;
+    margin: 0 auto 15px;
+    display: flex;
+    gap: 8px;
+}
 
-        .input-group {
-            display: flex;
-            background: var(--card);
-            border-radius: 12px;
-            padding: 5px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+#adjustArea{
+display:none;
+max-width:500px;
+margin:14px auto;
+padding:16px;
+border-radius:20px;
+background:var(--card);
+border:1px solid #333;
+}
 
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            outline: none;
-            font-size: 16px;
-        }
+.adj-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:12px;
+}
 
-        .btn-manual { background: rgba(255,255,255,0.1); color: white; padding: 10px 20px; }
+.btn-adj{
+border:none;
+border-radius:12px;
+padding:12px 0;
+font-size:16px;
+font-weight:900;
+cursor:pointer;
+}
 
-        #status {
-            width: 85%;
-            max-width: 380px;
-            margin-top: 25px;
-            padding: 25px;
-            border-radius: 20px;
-            background: var(--card);
-            border-left: 8px solid #444;
-            transition: all 0.3s ease;
-        }
+.plus{background:#214d2b;color:#b9f6ca;}
+.minus{background:#5a2727;color:#ffcdd2;}
 
-        .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.1); }
-        .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.1); }
-        .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.1); }
+.input-group{
+display:flex;
+gap:10px;
+}
 
-        .big { font-size: 28px; font-weight: 900; margin-bottom: 5px; }
-        .sub { font-size: 14px; opacity: 0.7; }
-    </style>
+input{
+flex:1;
+padding:12px;
+border-radius:12px;
+border:1px solid #444;
+background:#111;
+color:#fff;
+font-size:16px;
+text-align:center;
+}
+
+input:focus{outline:none; border-color:var(--blue);}
+
+.btn-send{
+flex:.45;
+border:none;
+border-radius:12px;
+font-weight:900;
+background:#e67e22;
+color:#fff;
+cursor:pointer;
+}
+
+.btn-manual{
+background:#34495e;
+color:#fff;
+flex:0.4;
+}
+
+.hr{
+border-top:1px dashed #444;
+margin:10px 0;
+}
+
+.big{
+font-size:18px;
+font-weight:900;
+}
+</style>
 </head>
+
 <body>
 
-    <h2>🎟️ 後慈湖驗票系統</h2>
+<h2>🎟️ 後慈湖驗票系統 Turbo</h2>
 
-    <div id="reader-container">
-        <div class="scan-line" id="line"></div>
-        <div id="reader"></div>
-    </div>
+<div id="reader"></div>
 
-    <div class="controls">
-        <button id="start-btn">📷 啟動掃描鏡頭</button>
-        <div class="input-group">
-            <input id="manual-input" type="text" placeholder="手動輸入票號碼...">
-            <button class="btn-manual" onclick="manualCheck()">驗票</button>
-        </div>
-    </div>
+<button id="start">📷 啟動相機驗票</button>
 
-    <div id="status" class="status">
-        <div class="big">準備就緒</div>
-        <div class="sub">請點擊上方按鈕開啟相機</div>
-    </div>
+<!-- 手動輸入區 -->
+<div class="manual-box">
+    <input type="text" id="manualTicketInput" placeholder="請手動輸入票號">
+    <button id="manualSubmitBtn" class="btn-send btn-manual">🎫 驗票</button>
+</div>
+
+<div id="status" class="status">
+👋 請點擊上方按鈕或輸入票號
+</div>
+
+<div id="adjustArea">
+<div style="font-weight:900;color:var(--blue);margin-bottom:10px;">🔧 進園人數微調</div>
+
+<div class="adj-grid">
+<button class="btn-adj minus" onclick="adjust(-1)">-1</button>
+<button class="btn-adj plus" onclick="adjust(1)">+1</button>
+<button class="btn-adj minus" onclick="adjust(-5)">-5</button>
+<button class="btn-adj plus" onclick="adjust(5)">+5</button>
+</div>
+
+<div class="input-group">
+<input type="number" id="manualDiff" placeholder="輸入數字">
+<button class="btn-send" onclick="handleManualAdjust()">📤送出</button>
+</div>
+</div>
 
 <script>
-    const API_URL = "你的_GAS_部署網址"; // 請替換成實際網址
-    const TOKEN = "abc123";
+const API_URL="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
 
-    let html5QrCode;
-    let isProcessing = false;
-    let lastResult = "";
+let qr=null;
+let scanning=false;
+let lastScan=0;
+let lastTicketId="";
 
-    const okSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-    const errSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+const statusEl=document.getElementById("status");
+const startBtn=document.getElementById("start");
+const adjArea=document.getElementById("adjustArea");
+const manualInput = document.getElementById("manualTicketInput");
+const manualBtn = document.getElementById("manualSubmitBtn");
 
-    const statusEl = document.getElementById("status");
-    const scanLine = document.getElementById("line");
+// 啟動相機
+startBtn.onclick=()=>{
+    if(qr) return;
+    startBtn.innerText="⏳ 啟動中...";
+    startCamera();
+};
 
-    document.getElementById("start-btn").onclick = function() {
-        if (html5QrCode) return; // 防止重複初始化
-        
-        html5QrCode = new Html5Qrcode("reader");
-        scanLine.style.display = "block";
-        
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 20, qrbox: { width: 250, height: 250 } },
-            onScanSuccess
-        ).catch(err => {
-            updateStatus("無法開啟鏡頭", "err");
-            console.error(err);
-        });
-    };
+// 手動輸入驗票
+manualBtn.onclick=()=>{
+    const val = manualInput.value.trim();
+    if(!val) return;
+    onScan(val);
+    manualInput.value = "";
+};
 
-    function onScanSuccess(decodedText) {
-        if (isProcessing) return;
+function startCamera(){
+    qr=new Html5Qrcode("reader");
+    qr.start(
+        {facingMode:"environment"},
+        {
+            fps:30,
+            qrbox:{width:200,height:200},
+            aspectRatio:1,
+            disableFlip:true,
+            rememberLastUsedCamera:true,
+            videoConstraints:{
+                facingMode:"environment",
+                width:{ideal:640},
+                height:{ideal:480}
+            }
+        },
+        onScan
+    ).then(()=>{
+        statusEl.className="status wait";
+        statusEl.textContent="🔍 正在尋找 QR Code...";
+        startBtn.style.display="none";
+    })
+    .catch(()=>{
+        statusEl.className="status err";
+        statusEl.textContent="❌ 相機啟動失敗";
+        startBtn.innerText="📷 重試啟動";
+        qr=null;
+    });
+}
 
-        // 解析 URL 參數或直接讀取文本
-        let id = decodedText;
-        if (decodedText.includes("id=")) {
-            const urlParams = new URLSearchParams(decodedText.split('?')[1]);
-            id = urlParams.get('id');
+function onScan(text){
+    const now=Date.now();
+    if(scanning || (now-lastScan < 1200)) return;
+
+    lastScan=now;
+    scanning=true;
+
+    if(navigator.vibrate) navigator.vibrate(50);
+
+    statusEl.className="status wait";
+    statusEl.textContent="⚡ 驗證中...";
+
+    // 如果相機正在運行，先暫停
+    if(qr && qr.getState() === 2) qr.pause(true);
+
+    const id=text.includes("id=")
+        ? text.split("id=")[1].split("&")[0]
+        : text;
+
+    lastTicketId=id;
+
+    fetch(API_URL,{
+        method:"POST",
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        cache:"no-store",
+        keepalive:true,
+        body:JSON.stringify({
+            id:id,
+            action:"verify"
+        })
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(!res.ok){
+            statusEl.className="status err";
+            statusEl.textContent="🚫 驗票失敗 " + (res.msg || "");
+            resumeScan(900);
+            return;
         }
 
-        if (id === lastResult) return; // 避免對同一張票重複發送請求
+        renderSuccess(res);
+        adjArea.style.display="block";
+        resumeScan(1600);
+    })
+    .catch(()=>{
+        statusEl.className="status err";
+        statusEl.textContent="🌐 網路異常";
+        resumeScan(900);
+    });
+}
 
-        isProcessing = true;
-        lastResult = id;
-        updateStatus("正在驗證：" + id, "wait");
-        
-        verifyTicket(id);
-    }
+function resumeScan(ms){
+    setTimeout(()=>{
+        // 只有在相機處於暫停狀態時才恢復
+        if(qr && qr.getState() === 3) qr.resume();
+        scanning=false;
+    },ms);
+}
 
-    function manualCheck() {
-        const val = document.getElementById("manual-input").value.trim();
-        if (!val) return;
-        onScanSuccess(val);
-    }
+function renderSuccess(res){
+    const d=res.detail || {};
+    statusEl.className="status ok";
+    statusEl.innerHTML=`
+        <div class="big" style="color:#2ecc71;">✅ 驗票通過</div>
+        <div style="margin-top:8px;">👥 總人數：<span class="big">${d.people || 0}</span> 人</div>
+        <div class="hr"></div>
+        <div>🔸 現金：${d.cash_full || 0}全 / ${d.cash_group || 0}團 / ${d.cash_discount || 0}優</div>
+        <div>🔸 悠遊：${d.card_full || 0}全 / ${d.card_group || 0}團 / ${d.card_discount || 0}優</div>
+        <div>🔸 免費：${d.free || 0} 人</div>
+        <div class="hr"></div>
+        <div class="big">📊 場內總計：${res.current || 0} 人</div>
+    `;
+}
 
-    function verifyTicket(id) {
-        // 使用 POST 傳送資料到 GAS
-        fetch(API_URL, {
-            method: "POST",
-            mode: "no-cors", // 注意：GAS POST 經常需要 no-cors，但這會拿不到 Response body
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                "id": id,
-                "token": TOKEN,
-                "action": "verify"
-            })
+function handleManualAdjust(){
+    const val=parseInt(document.getElementById("manualDiff").value);
+    if(isNaN(val)||val===0) return;
+    adjust(val);
+    document.getElementById("manualDiff").value="";
+}
+
+function adjust(diff){
+    statusEl.className="status wait";
+    statusEl.textContent="🔄 同步中...";
+
+    fetch(API_URL,{
+        method:"POST",
+        cache:"no-store",
+        keepalive:true,
+        body:JSON.stringify({
+            type:"IN",
+            delta:diff,
+            source:"驗票端微調",
+            note:"票號:"+lastTicketId
         })
-        .then(() => {
-            // 因為 no-cors 模式無法讀取 JSON 回傳值，建議 GAS 端若驗證成功則直接運作
-            // 若需要解析回傳 JSON，GAS 必須處理 OPTIONS 預檢請求或使用 JSONP (較複雜)
-            okSound.play();
-            updateStatus(`<div class="big">✅ 發送成功</div><div class="sub">票號：${id}</div>`, "ok");
-            setTimeout(() => { isProcessing = false; lastResult = ""; }, 3000);
-        })
-        .catch(err => {
-            errSound.play();
-            updateStatus("📡 連線失敗", "err");
-            isProcessing = false;
-        });
-    }
-
-    function updateStatus(msg, type) {
-        statusEl.className = "status " + type;
-        statusEl.innerHTML = msg;
-        if (navigator.vibrate) navigator.vibrate(80);
-    }
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        statusEl.className="status ok";
+        statusEl.innerHTML=`
+            <div class="big" style="color:#2ecc71;">
+            ✅ 已修正 ${diff>0?'+':''}${diff}
+            </div>
+            <div class="hr"></div>
+            <div class="big">📊 目前場內：${res.current || 0} 人</div>
+        `;
+    })
+    .catch(()=>{
+        statusEl.className="status err";
+        statusEl.textContent="❌ 同步失敗";
+    });
+}
 </script>
+
 </body>
 </html>

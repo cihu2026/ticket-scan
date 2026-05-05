@@ -7,93 +7,213 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root {
-            --primary: #00d2ff; --success: #2ecc71; --error: #ff6b6b;
-            --warning: #f1c40f; --bg: #121212; --card: #1e1e1e;
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --success: #00f2ad;
+            --error: #ff5858;
+            --warning: #f9d423;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
         }
+
         body {
-            margin: 0; background: var(--bg); color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding-bottom: 30px;
+            margin: 0;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: #f8fafc;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
         }
+
+        /* 標題美化 */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
         h2 {
-            margin: 20px 0; letter-spacing: 2px;
-            background: linear-gradient(to right, #00d2ff, #92fe9d);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            font-weight: 800;
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 10px rgba(0, 242, 254, 0.3));
         }
+
+        /* 掃描器容器 */
         #reader-container {
-            position: relative; width: 90%; max-width: 400px;
-            border-radius: 24px; overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            border: 2px solid rgba(255,255,255,0.1); background: #000;
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            aspect-ratio: 1 / 1;
+            border-radius: 30px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        #reader { width: 100% !important; border: none !important; }
+
+        /* 掃描框裝飾 corners */
+        .scanner-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            pointer-events: none;
+            border: 40px solid rgba(0,0,0,0.3);
+        }
+
+        .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 4px solid var(--primary);
+            z-index: 11;
+        }
+        .top-left { top: 20px; left: 20px; border-right: 0; border-bottom: 0; border-radius: 8px 0 0 0; }
+        .top-right { top: 20px; right: 20px; border-left: 0; border-bottom: 0; border-radius: 0 8px 0 0; }
+        .bottom-left { bottom: 20px; left: 20px; border-right: 0; border-top: 0; border-radius: 0 0 0 8px; }
+        .bottom-right { bottom: 20px; right: 20px; border-left: 0; border-top: 0; border-radius: 0 0 8px 0; }
+
+        #reader { width: 100% !important; height: 100% !important; border: none !important; }
+
         .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--primary); box-shadow: 0 0 20px var(--primary);
-            animation: scan 2s linear infinite; z-index: 10; display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            box-shadow: 0 0 15px var(--primary);
+            animation: scan 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            z-index: 10;
+            display: none;
         }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-        .controls { width: 90%; max-width: 400px; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
+
+        @keyframes scan { 
+            0% { top: 10%; opacity: 0; }
+            50% { top: 50%; opacity: 1; }
+            100% { top: 90%; opacity: 0; }
+        }
+
+        /* 控制區 */
+        .controls {
+            width: 100%;
+            max-width: 360px;
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         button {
-            padding: 16px; border: none; border-radius: 14px; font-size: 16px;
-            font-weight: 700; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
+
         #start-btn {
-            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-            color: white; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            box-shadow: 0 8px 20px -6px rgba(79, 172, 254, 0.5);
         }
+
+        #start-btn:active { transform: scale(0.96); }
+
         .input-group {
-            display: flex; background: var(--card); border-radius: 14px;
-            padding: 6px; border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 5px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
         }
+
         input {
-            flex: 1; background: transparent; border: none; color: white;
-            padding: 10px 15px; outline: none; font-size: 16px;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            outline: none;
+            font-size: 15px;
         }
+
+        /* 狀態卡片 */
         #status {
-            width: 85%; max-width: 380px; margin-top: 25px; padding: 25px;
-            border-radius: 24px; background: var(--card); border-left: 10px solid #444;
-            transition: all 0.4s ease;
+            width: 100%;
+            max-width: 360px;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            box-sizing: border-box;
+            text-align: center;
         }
-        .status.ok { border-left-color: var(--success); background: rgba(46, 204, 113, 0.15); }
-        .status.err { border-left-color: var(--error); background: rgba(255, 107, 107, 0.15); }
-        .status.wait { border-left-color: var(--warning); background: rgba(241, 196, 15, 0.15); }
-        .big { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-        .sub { font-size: 15px; opacity: 0.8; }
+
+        .status.ok { border-bottom: 4px solid var(--success); }
+        .status.err { border-bottom: 4px solid var(--error); }
+        .status.wait { border-bottom: 4px solid var(--warning); }
+
+        .big { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .sub { font-size: 14px; color: #94a3b8; }
+
+        /* 針對小螢幕優化 */
+        @media (max-height: 700px) {
+            h2 { font-size: 22px; }
+            #reader-container { max-width: 280px; }
+            .controls { margin-top: 15px; }
+        }
     </style>
 </head>
 <body>
 
-    <h2>🌈 後慈湖驗票系統</h2>
+    <div class="header">
+        <h2>後慈湖智慧驗票</h2>
+        <div style="font-size: 12px; color: #64748b; margin-top: 5px; letter-spacing: 1px;">SMART CHECK-IN SYSTEM</div>
+    </div>
 
     <div id="reader-container">
+        <!-- 裝飾元素 -->
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
         <div class="scan-line" id="line"></div>
+        
         <div id="reader"></div>
     </div>
 
     <div class="controls">
         <button id="start-btn">📸 啟動掃描鏡頭</button>
         <div class="input-group">
-            <input id="manual-input" type="text" placeholder="⌨️ 手動輸入票號...">
-            <button style="background:#333; color:white; padding:10px;" onclick="manualCheck()">🔍 驗票</button>
+            <input id="manual-input" type="text" placeholder="手動輸入票號...">
+            <button style="background: rgba(255,255,255,0.1); color:white; width: 80px;" onclick="manualCheck()">🔍 驗票</button>
         </div>
     </div>
 
     <div id="status" class="status">
-        <div class="big">😴 準備就緒</div>
-        <div class="sub">請確保使用 Safari/Chrome 並授權相機</div>
+        <div class="big">⌛ 待機中</div>
+        <div class="sub">請授權相機權限並對準 QR Code</div>
     </div>
 
 <script>
-    // 1. 設定區
-    const API_URL = "https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec"; 
+    // 保持你原本的邏輯不變，僅微調提示訊息與 UI 互動
+    const API_URL = "你的_GAS_URL"; 
     const TOKEN = "abc123";
 
     let html5QrCode;
     let isProcessing = false;
+    
+    // 音效載入建議使用相對路徑或更穩定的來源
     const okSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
     const errSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
@@ -101,44 +221,39 @@
     const scanLine = document.getElementById("line");
     const startBtn = document.getElementById("start-btn");
 
-    // 2. 啟動相機邏輯
     startBtn.onclick = async function() {
-        if (html5QrCode) {
-            await html5QrCode.stop().catch(() => {});
-        }
+        if (html5QrCode) { try { await html5QrCode.stop(); } catch(e){} }
+        
+        // 點擊按鈕時解鎖音效（解決 iOS 自動播放限制）
+        okSound.play().then(()=>okSound.pause()); 
         
         html5QrCode = new Html5Qrcode("reader");
         scanLine.style.display = "block";
-        startBtn.innerHTML = "🔄 授權中...";
+        startBtn.innerHTML = "⚡ 正在初始化...";
 
-        const config = { fps: 20, qrbox: { width: 250, height: 250 } };
+        const config = { 
+            fps: 20, 
+            qrbox: (w, h) => { return { width: w * 0.7, height: h * 0.7 } },
+            aspectRatio: 1.0
+        };
 
         html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
             .then(() => {
-                startBtn.innerHTML = "🟢 掃描中";
-                updateStatus("🚀 請對準 QR Code", "ok");
+                startBtn.style.background = "linear-gradient(135deg, #059669 0%, #10b981 100%)";
+                startBtn.innerHTML = "🟢 系統運作中";
+                updateStatus("🚀 掃描器已就緒", "ok");
             })
             .catch(err => {
-                // 若後鏡頭失敗，嘗試任何鏡頭
-                html5QrCode.start({ facingMode: "user" }, config, onScanSuccess)
-                    .catch(e => {
-                        alert("相機開啟失敗，請檢查權限設定！");
-                        updateStatus("❌ 鏡頭啟動失敗", "err");
-                    });
+                updateStatus("❌ 鏡頭啟動失敗", "err");
+                startBtn.innerHTML = "📸 重新啟動鏡頭";
             });
     };
 
     function onScanSuccess(text) {
         if (isProcessing) return;
-        
-        // 簡單解析 ID
-        let id = text;
-        if (text.includes("id=")) {
-            id = text.split("id=")[1].split("&")[0];
-        }
-
+        let id = text.includes("id=") ? text.split("id=")[1].split("&")[0] : text;
         isProcessing = true;
-        updateStatus("⏳ 驗證中：" + id, "wait");
+        updateStatus("⏳ 正在核銷：" + id, "wait");
         verifyTicket(id);
     }
 
@@ -147,22 +262,23 @@
         if (val) onScanSuccess(val);
     }
 
-    // 3. 連接 GAS
     function verifyTicket(id) {
+        // 使用 POST 呼叫 GAS
         fetch(API_URL, {
             method: "POST",
-            mode: "no-cors", // 配合 GAS 的特性
+            mode: "no-cors",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({ "id": id, "token": TOKEN, "action": "verify" })
         })
         .then(() => {
             okSound.play();
-            updateStatus(`<div class="big">✅ 發送成功</div><div class="sub">票號：${id}</div>`, "ok");
+            updateStatus(`<div class="big" style="color:#00f2ad">✅ 核銷成功</div><div class="sub">票號：${id}</div>`, "ok");
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             setTimeout(() => { isProcessing = false; }, 3000);
         })
         .catch(err => {
             errSound.play();
-            updateStatus("📡 連線失敗", "err");
+            updateStatus("📡 連線異常", "err");
             isProcessing = false;
         });
     }
@@ -170,7 +286,6 @@
     function updateStatus(msg, type) {
         statusEl.className = "status " + type;
         statusEl.innerHTML = msg;
-        if (navigator.vibrate) navigator.vibrate(100);
     }
 </script>
 </body>

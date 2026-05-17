@@ -256,6 +256,13 @@ function onScan(text){
     const now=Date.now();
     if(scanning || (now-lastScan < 1200)) return;
 
+    const id=extractTicketId(text);
+    if(!id){
+        statusEl.className="status err";
+        statusEl.textContent="🚫 票號格式錯誤";
+        return;
+    }
+
     lastScan=now;
     scanning=true;
 
@@ -264,12 +271,7 @@ function onScan(text){
     statusEl.className="status wait";
     statusEl.textContent="⚡ 驗證中...";
 
-    // 如果相機正在運行，先暫停
-    if(qr && qr.getState() === 2) qr.pause(true);
-
-    const id=text.includes("id=")
-        ? text.split("id=")[1].split("&")[0]
-        : text;
+    pauseScanner();
 
     lastTicketId=id;
 
@@ -303,12 +305,52 @@ function onScan(text){
     });
 }
 
+function extractTicketId(text){
+    const raw=String(text || "").trim();
+    if(!raw) return "";
+
+    try{
+        const parsedUrl=new URL(raw, window.location.href);
+        const id=parsedUrl.searchParams.get("id");
+        if(id !== null) return id.trim();
+    }catch(e){
+        // 掃描內容可能不是 URL，改用下方備援解析。
+    }
+
+    const idMatch=raw.match(/[?&]id=([^&]+)/);
+    if(idMatch){
+        try{
+            return decodeURIComponent(idMatch[1].replace(/\+/g," ")).trim();
+        }catch(e){
+            return idMatch[1].trim();
+        }
+    }
+
+    return raw;
+}
+
+function scannerState(){
+    if(!qr || typeof qr.getState !== "function") return null;
+    return qr.getState();
+}
+
+function pauseScanner(){
+    if(scannerState() === 2 && typeof qr.pause === "function"){
+        qr.pause(true);
+    }
+}
+
 function resumeScan(ms){
     setTimeout(()=>{
         // 只有在相機處於暫停狀態時才恢復
-        if(qr && qr.getState() === 3) qr.resume();
+        if(scannerState() === 3 && typeof qr.resume === "function") qr.resume();
         scanning=false;
     },ms);
+}
+
+function displayNumber(value){
+    const number=Number(value);
+    return Number.isFinite(number) ? String(number) : "0";
 }
 
 function renderSuccess(res){
@@ -316,13 +358,13 @@ function renderSuccess(res){
     statusEl.className="status ok";
     statusEl.innerHTML=`
         <div class="big" style="color:#2ecc71;">✅ 驗票通過</div>
-        <div style="margin-top:8px;">👥 總人數：<span class="big">${d.people || 0}</span> 人</div>
+        <div style="margin-top:8px;">👥 總人數：<span class="big">${displayNumber(d.people)}</span> 人</div>
         <div class="hr"></div>
-        <div>🔸 現金：${d.cash_full || 0}全 / ${d.cash_group || 0}團 / ${d.cash_discount || 0}優</div>
-        <div>🔸 悠遊：${d.card_full || 0}全 / ${d.card_group || 0}團 / ${d.card_discount || 0}優</div>
-        <div>🔸 免費：${d.free || 0} 人</div>
+        <div>🔸 現金：${displayNumber(d.cash_full)}全 / ${displayNumber(d.cash_group)}團 / ${displayNumber(d.cash_discount)}優</div>
+        <div>🔸 悠遊：${displayNumber(d.card_full)}全 / ${displayNumber(d.card_group)}團 / ${displayNumber(d.card_discount)}優</div>
+        <div>🔸 免費：${displayNumber(d.free)} 人</div>
         <div class="hr"></div>
-        <div class="big">📊 場內總計：${res.current || 0} 人</div>
+        <div class="big">📊 場內總計：${displayNumber(res.current)} 人</div>
     `;
 }
 
@@ -339,6 +381,7 @@ function adjust(diff){
 
     fetch(API_URL,{
         method:"POST",
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
         cache:"no-store",
         keepalive:true,
         body:JSON.stringify({
@@ -356,7 +399,7 @@ function adjust(diff){
             ✅ 已修正 ${diff>0?'+':''}${diff}
             </div>
             <div class="hr"></div>
-            <div class="big">📊 目前場內：${res.current || 0} 人</div>
+            <div class="big">📊 目前場內：${displayNumber(res.current)} 人</div>
         `;
     })
     .catch(()=>{

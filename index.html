@@ -5,409 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>🎟️ 後慈湖驗票系統 Turbo</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-
 <style>
-:root{
---bg:#121212;
---card:#1e1e1e;
---line:#333;
---blue:#00d2ff;
---green:#2ecc71;
---red:#e74c3c;
---yellow:#f1c40f;
-}
-
-*{box-sizing:border-box;}
-
-body{
-margin:0;
-padding:15px;
-font-family:"Noto Sans TC",sans-serif;
-background:var(--bg);
-color:#fff;
-text-align:center;
-}
-
-h2{
-margin:12px 0 16px;
-font-size:24px;
-font-weight:900;
-color:var(--blue);
-}
-
-#reader{
-max-width:500px;
-margin:0 auto 14px;
-border-radius:22px;
-overflow:hidden;
-background:#000;
-border:2px solid #222;
-box-shadow:0 10px 28px rgba(0,0,0,.45);
-}
-
-#start{
-width:92%;
-max-width:500px;
-padding:17px;
-border:none;
-border-radius:50px;
-font-size:19px;
-font-weight:900;
-color:#fff;
-cursor:pointer;
-background:linear-gradient(135deg,#00d2ff,#3a7bd5);
-margin-bottom: 10px;
-}
-
-.status{
-max-width:500px;
-margin:14px auto;
-padding:18px;
-min-height:72px;
-border-radius:20px;
-background:var(--card);
-border:1px solid var(--line);
-line-height:1.6;
-font-size:16px;
-}
-
-.wait{border:2px solid var(--yellow); color:var(--yellow);}
-.ok{border:2px solid var(--green); background:rgba(46,204,113,.08);}
-.err{border:2px solid var(--red); color:#ff9e9e; background:rgba(231,76,60,.08);}
-
-/* 手動輸入區塊美化 */
-.manual-box {
-    max-width: 500px;
-    margin: 0 auto 15px;
-    display: flex;
-    gap: 8px;
-}
-
-#adjustArea{
-display:none;
-max-width:500px;
-margin:14px auto;
-padding:16px;
-border-radius:20px;
-background:var(--card);
-border:1px solid #333;
-}
-
-.adj-grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-margin-bottom:12px;
-}
-
-.btn-adj{
-border:none;
-border-radius:12px;
-padding:12px 0;
-font-size:16px;
-font-weight:900;
-cursor:pointer;
-}
-
-.plus{background:#214d2b;color:#b9f6ca;}
-.minus{background:#5a2727;color:#ffcdd2;}
-
-.input-group{
-display:flex;
-gap:10px;
-}
-
-input{
-flex:1;
-padding:12px;
-border-radius:12px;
-border:1px solid #444;
-background:#111;
-color:#fff;
-font-size:16px;
-text-align:center;
-}
-
-input:focus{outline:none; border-color:var(--blue);}
-
-.btn-send{
-flex:.45;
-border:none;
-border-radius:12px;
-font-weight:900;
-background:#e67e22;
-color:#fff;
-cursor:pointer;
-}
-
-.btn-manual{
-background:#34495e;
-color:#fff;
-flex:0.4;
-}
-
-.hr{
-border-top:1px dashed #444;
-margin:10px 0;
-}
-
-.big{
-font-size:18px;
-font-weight:900;
-}
+:root{--bg:#0b1220;--card:rgba(255,255,255,.08);--line:rgba(255,255,255,.16);--blue:#00d2ff;--blue2:#3a7bd5;--green:#2ecc71;--red:#ff5c70;--yellow:#f1c40f;--text:#fff;--muted:#b8c2d6;--shadow:0 18px 45px rgba(0,0,0,.38)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;min-height:100vh;padding:14px;font-family:"Noto Sans TC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(0,210,255,.22),transparent 34%),radial-gradient(circle at bottom right,rgba(46,204,113,.13),transparent 30%),linear-gradient(145deg,var(--bg),#060910 72%);color:var(--text);text-align:center}.app{max-width:540px;margin:0 auto}h2{margin:10px 0 6px;font-size:25px;font-weight:900;letter-spacing:.5px;text-shadow:0 0 24px rgba(0,210,255,.45)}.subtitle{margin:0 0 12px;font-size:13px;color:var(--muted)}.netbar{display:flex;justify-content:space-between;align-items:center;gap:8px;max-width:500px;margin:0 auto 12px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);backdrop-filter:blur(14px);font-size:13px;color:var(--muted)}.pill{display:inline-flex;align-items:center;gap:6px;font-weight:900}.dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}.offline .dot{background:var(--yellow);box-shadow:0 0 12px var(--yellow)}#reader{max-width:500px;min-height:260px;margin:0 auto 14px;border-radius:28px;overflow:hidden;background:#000;border:1px solid rgba(255,255,255,.18);box-shadow:var(--shadow)}#reader video{object-fit:cover!important}button{transition:transform .08s ease,filter .12s ease,opacity .12s ease}button:active{transform:scale(.97)}button:disabled{opacity:.55;cursor:not-allowed}#start{width:100%;max-width:500px;padding:17px;border:none;border-radius:999px;font-size:19px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 12px 30px rgba(0,210,255,.26);margin-bottom:10px}.status{max-width:500px;margin:13px auto;padding:18px;min-height:76px;border-radius:24px;background:var(--card);border:1px solid var(--line);line-height:1.6;font-size:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);backdrop-filter:blur(16px)}.wait{border:2px solid var(--yellow);color:#ffeaa7;background:rgba(241,196,15,.09)}.ok{border:2px solid var(--green);background:rgba(46,204,113,.11)}.err{border:2px solid var(--red);color:#ffd1d8;background:rgba(255,92,112,.12)}.offsave{border:2px solid var(--yellow);color:#fff1a8;background:rgba(241,196,15,.13)}.manual-box{max-width:500px;margin:0 auto 14px;display:grid;grid-template-columns:1fr 112px;gap:9px}#adjustArea{display:none;max-width:500px;margin:14px auto;padding:16px;border-radius:24px;background:var(--card);border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.22);backdrop-filter:blur(16px)}.adj-title{font-weight:900;color:var(--blue);margin-bottom:12px}.adj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.btn-adj{border:none;border-radius:16px;padding:14px 0;font-size:18px;font-weight:900;cursor:pointer}.plus{background:linear-gradient(180deg,#286c3a,#174424);color:#c8ffd8}.minus{background:linear-gradient(180deg,#743033,#4a1e22);color:#ffd5dc}.input-group{display:grid;grid-template-columns:1fr 112px;gap:10px}input{width:100%;padding:14px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.32);color:#fff;font-size:17px;text-align:center;outline:none}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,210,255,.12)}.btn-send{border:none;border-radius:16px;font-weight:900;background:linear-gradient(135deg,#ff9f43,#e67e22);color:#fff;cursor:pointer;font-size:16px}.btn-manual{background:linear-gradient(135deg,#52677f,#2d3f53)}.hr{border-top:1px dashed rgba(255,255,255,.25);margin:10px 0}.big{font-size:18px;font-weight:900}.small{font-size:13px;color:var(--muted)}.queue-list{margin-top:8px;font-size:13px;color:#ffeaa7}@media (max-width:390px){body{padding:10px}h2{font-size:22px}.manual-box,.input-group{grid-template-columns:1fr 96px}.adj-grid{gap:8px}.btn-adj{font-size:16px;padding:13px 0}}
 </style>
 </head>
-
 <body>
-
+<div class="app">
 <h2>🎟️ 後慈湖驗票系統 Turbo</h2>
-
+<p class="subtitle">快速驗票・離線暫存・恢復網路自動同步</p>
+<div id="netbar" class="netbar"><span id="netStatus" class="pill"><span class="dot"></span><span>連線正常</span></span><span id="queueCount">待同步 0 筆</span></div>
 <div id="reader"></div>
-
 <button id="start">📷 啟動相機驗票</button>
-
-<!-- 手動輸入區 -->
-<div class="manual-box">
-    <input type="text" id="manualTicketInput" placeholder="請手動輸入票號">
-    <button id="manualSubmitBtn" class="btn-send btn-manual">🎫 驗票</button>
+<div class="manual-box"><input type="text" id="manualTicketInput" placeholder="請手動輸入票號" autocomplete="off"><button id="manualSubmitBtn" class="btn-send btn-manual">🎫 驗票</button></div>
+<div id="status" class="status">👋 請點擊上方按鈕或輸入票號</div>
+<div id="adjustArea"><div class="adj-title">🔧 進園人數微調</div><div class="adj-grid"><button class="btn-adj minus" onclick="adjust(-1)">-1</button><button class="btn-adj plus" onclick="adjust(1)">+1</button><button class="btn-adj minus" onclick="adjust(-5)">-5</button><button class="btn-adj plus" onclick="adjust(5)">+5</button></div><div class="input-group"><input type="number" id="manualDiff" placeholder="輸入數字"><button class="btn-send" onclick="handleManualAdjust()">📤送出</button></div></div>
 </div>
-
-<div id="status" class="status">
-👋 請點擊上方按鈕或輸入票號
-</div>
-
-<div id="adjustArea">
-<div style="font-weight:900;color:var(--blue);margin-bottom:10px;">🔧 進園人數微調</div>
-
-<div class="adj-grid">
-<button class="btn-adj minus" onclick="adjust(-1)">-1</button>
-<button class="btn-adj plus" onclick="adjust(1)">+1</button>
-<button class="btn-adj minus" onclick="adjust(-5)">-5</button>
-<button class="btn-adj plus" onclick="adjust(5)">+5</button>
-</div>
-
-<div class="input-group">
-<input type="number" id="manualDiff" placeholder="輸入數字">
-<button class="btn-send" onclick="handleManualAdjust()">📤送出</button>
-</div>
-</div>
-
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbw5VQi-dtLodRQbKTgzueGGXgMBBedA_Th93Skr_Dia3-JYbxtd00shnZ24axbznDY/exec";
-
-let qr=null;
-let scanning=false;
-let lastScan=0;
-let lastTicketId="";
-
-const statusEl=document.getElementById("status");
-const startBtn=document.getElementById("start");
-const adjArea=document.getElementById("adjustArea");
-const manualInput = document.getElementById("manualTicketInput");
-const manualBtn = document.getElementById("manualSubmitBtn");
-
-// 啟動相機
-startBtn.onclick=()=>{
-    if(qr) return;
-    startBtn.innerText="⏳ 啟動中...";
-    startCamera();
-};
-
-// 手動輸入驗票
-manualBtn.onclick=()=>{
-    const val = manualInput.value.trim();
-    if(!val) return;
-    onScan(val);
-    manualInput.value = "";
-};
-
-function startCamera(){
-    qr=new Html5Qrcode("reader");
-    qr.start(
-        {facingMode:"environment"},
-        {
-            fps:30,
-            qrbox:{width:200,height:200},
-            aspectRatio:1,
-            disableFlip:true,
-            rememberLastUsedCamera:true,
-            videoConstraints:{
-                facingMode:"environment",
-                width:{ideal:640},
-                height:{ideal:480}
-            }
-        },
-        onScan
-    ).then(()=>{
-        statusEl.className="status wait";
-        statusEl.textContent="🔍 正在尋找 QR Code...";
-        startBtn.style.display="none";
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="❌ 相機啟動失敗";
-        startBtn.innerText="📷 重試啟動";
-        qr=null;
-    });
-}
-
-function onScan(text){
-    const now=Date.now();
-    if(scanning || (now-lastScan < 1200)) return;
-
-    const id=extractTicketId(text);
-    if(!id){
-        statusEl.className="status err";
-        statusEl.textContent="🚫 票號格式錯誤";
-        return;
-    }
-
-    lastScan=now;
-    scanning=true;
-
-    if(navigator.vibrate) navigator.vibrate(50);
-
-    statusEl.className="status wait";
-    statusEl.textContent="⚡ 驗證中...";
-
-    pauseScanner();
-
-    lastTicketId=id;
-
-    fetch(API_URL,{
-        method:"POST",
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        cache:"no-store",
-        keepalive:true,
-        body:JSON.stringify({
-            id:id,
-            action:"verify"
-        })
-    })
-    .then(r=>r.json())
-    .then(res=>{
-        if(!res.ok){
-            statusEl.className="status err";
-            statusEl.textContent="🚫 驗票失敗 " + (res.msg || "");
-            resumeScan(900);
-            return;
-        }
-
-        renderSuccess(res);
-        adjArea.style.display="block";
-        resumeScan(1600);
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="🌐 網路異常";
-        resumeScan(900);
-    });
-}
-
-function extractTicketId(text){
-    const raw=String(text || "").trim();
-    if(!raw) return "";
-
-    try{
-        const parsedUrl=new URL(raw, window.location.href);
-        const id=parsedUrl.searchParams.get("id");
-        if(id !== null) return id.trim();
-    }catch(e){
-        // 掃描內容可能不是 URL，改用下方備援解析。
-    }
-
-    const idMatch=raw.match(/[?&]id=([^&]+)/);
-    if(idMatch){
-        try{
-            return decodeURIComponent(idMatch[1].replace(/\+/g," ")).trim();
-        }catch(e){
-            return idMatch[1].trim();
-        }
-    }
-
-    return raw;
-}
-
-function scannerState(){
-    if(!qr || typeof qr.getState !== "function") return null;
-    return qr.getState();
-}
-
-function pauseScanner(){
-    if(scannerState() === 2 && typeof qr.pause === "function"){
-        qr.pause(true);
-    }
-}
-
-function resumeScan(ms){
-    setTimeout(()=>{
-        // 只有在相機處於暫停狀態時才恢復
-        if(scannerState() === 3 && typeof qr.resume === "function") qr.resume();
-        scanning=false;
-    },ms);
-}
-
-function displayNumber(value){
-    const number=Number(value);
-    return Number.isFinite(number) ? String(number) : "0";
-}
-
-function renderSuccess(res){
-    const d=res.detail || {};
-    statusEl.className="status ok";
-    statusEl.innerHTML=`
-        <div class="big" style="color:#2ecc71;">✅ 驗票通過</div>
-        <div style="margin-top:8px;">👥 總人數：<span class="big">${displayNumber(d.people)}</span> 人</div>
-        <div class="hr"></div>
-        <div>🔸 現金：${displayNumber(d.cash_full)}全 / ${displayNumber(d.cash_group)}團 / ${displayNumber(d.cash_discount)}優</div>
-        <div>🔸 悠遊：${displayNumber(d.card_full)}全 / ${displayNumber(d.card_group)}團 / ${displayNumber(d.card_discount)}優</div>
-        <div>🔸 免費：${displayNumber(d.free)} 人</div>
-        <div class="hr"></div>
-        <div class="big">📊 場內總計：${displayNumber(res.current)} 人</div>
-    `;
-}
-
-function handleManualAdjust(){
-    const val=parseInt(document.getElementById("manualDiff").value);
-    if(isNaN(val)||val===0) return;
-    adjust(val);
-    document.getElementById("manualDiff").value="";
-}
-
-function adjust(diff){
-    statusEl.className="status wait";
-    statusEl.textContent="🔄 同步中...";
-
-    fetch(API_URL,{
-        method:"POST",
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        cache:"no-store",
-        keepalive:true,
-        body:JSON.stringify({
-            type:"IN",
-            delta:diff,
-            source:"驗票端微調",
-            note:"票號:"+lastTicketId
-        })
-    })
-    .then(r=>r.json())
-    .then(res=>{
-        statusEl.className="status ok";
-        statusEl.innerHTML=`
-            <div class="big" style="color:#2ecc71;">
-            ✅ 已修正 ${diff>0?'+':''}${diff}
-            </div>
-            <div class="hr"></div>
-            <div class="big">📊 目前場內：${displayNumber(res.current)} 人</div>
-        `;
-    })
-    .catch(()=>{
-        statusEl.className="status err";
-        statusEl.textContent="❌ 同步失敗";
-    });
-}
+const QUEUE_KEY="cihu_ticket_offline_queue_v2";
+let qr=null,scanning=false,lastScan=0,lastTicketId="",syncing=false;
+const statusEl=document.getElementById("status"),startBtn=document.getElementById("start"),adjArea=document.getElementById("adjustArea"),manualInput=document.getElementById("manualTicketInput"),manualBtn=document.getElementById("manualSubmitBtn"),netbar=document.getElementById("netbar"),netStatus=document.getElementById("netStatus"),queueCount=document.getElementById("queueCount");
+startBtn.onclick=()=>{if(qr)return;startBtn.innerText="⏳ 啟動中...";startCamera()};
+manualBtn.onclick=()=>{const val=manualInput.value.trim();if(!val)return;onScan(val,true);manualInput.value=""};
+manualInput.addEventListener("keydown",e=>{if(e.key==="Enter")manualBtn.click()});
+window.addEventListener("online",()=>{updateNetUI();flushQueue()});
+window.addEventListener("offline",updateNetUI);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)flushQueue()});
+updateNetUI();flushQueue();
+function startCamera(){qr=new Html5Qrcode("reader",{verbose:false});qr.start({facingMode:"environment"},{fps:24,qrbox:viewfinderSize,aspectRatio:1,disableFlip:true,rememberLastUsedCamera:true,videoConstraints:{facingMode:"environment",width:{ideal:720},height:{ideal:720}}},onScan).then(()=>{statusEl.className="status wait";statusEl.textContent="🔍 正在尋找 QR Code...";startBtn.style.display="none"}).catch(()=>{statusEl.className="status err";statusEl.textContent="❌ 相機啟動失敗，請確認相機權限";startBtn.innerText="📷 重試啟動";qr=null})}
+function viewfinderSize(w,h){const edge=Math.floor(Math.min(w,h)*0.72);return{width:Math.max(190,Math.min(edge,280)),height:Math.max(190,Math.min(edge,280))}}
+function onScan(text,isManual=false){const now=Date.now();if(scanning||(!isManual&&now-lastScan<850))return;const id=extractTicketId(text);if(!id){statusEl.className="status err";statusEl.textContent="🚫 票號格式錯誤";return}lastScan=now;scanning=true;lastTicketId=id;adjArea.style.display="block";if(navigator.vibrate)navigator.vibrate(35);statusEl.className="status wait";statusEl.textContent="⚡ 驗證中...";pauseScanner();const payload={id,action:"verify"};postFast(payload).then(res=>{if(!res.ok){statusEl.className="status err";statusEl.textContent="🚫 驗票失敗 "+(res.msg||"");resumeScan(650);return}renderSuccess(res);resumeScan(900)}).catch(()=>{saveOffline({kind:"verify",payload,createdAt:Date.now(),ticketId:id});renderOfflineSaved("🎟️ 已離線暫存票號",id);resumeScan(550)})}
+function extractTicketId(text){const raw=String(text||"").trim();if(!raw)return"";try{const parsedUrl=new URL(raw,window.location.href);const id=parsedUrl.searchParams.get("id");if(id!==null)return id.trim()}catch(e){}const idMatch=raw.match(/[?&]id=([^&]+)/);if(idMatch){try{return decodeURIComponent(idMatch[1].replace(/\+/g," ")).trim()}catch(e){return idMatch[1].trim()}}return raw}
+function scannerState(){if(!qr||typeof qr.getState!=="function")return null;return qr.getState()}
+function pauseScanner(){if(scannerState()===2&&typeof qr.pause==="function")qr.pause(true)}
+function resumeScan(ms){setTimeout(()=>{if(scannerState()===3&&typeof qr.resume==="function")qr.resume();scanning=false},ms)}
+function displayNumber(value){const number=Number(value);return Number.isFinite(number)?String(number):"0"}
+function renderSuccess(res){const d=res.detail||{};statusEl.className="status ok";statusEl.innerHTML=`<div class="big" style="color:#2ecc71;">✅ 驗票通過</div><div style="margin-top:8px;">👥 總人數：<span class="big">${displayNumber(d.people)}</span> 人</div><div class="hr"></div><div>🔸 現金：${displayNumber(d.cash_full)}全 / ${displayNumber(d.cash_group)}團 / ${displayNumber(d.cash_discount)}優</div><div>🔸 悠遊：${displayNumber(d.card_full)}全 / ${displayNumber(d.card_group)}團 / ${displayNumber(d.card_discount)}優</div><div>🔸 免費：${displayNumber(d.free)} 人</div><div class="hr"></div><div class="big">📊 場內總計：${displayNumber(res.current)} 人</div>`}
+function handleManualAdjust(){const val=parseInt(document.getElementById("manualDiff").value,10);if(isNaN(val)||val===0)return;adjust(val);document.getElementById("manualDiff").value=""}
+function adjust(diff){const payload={type:"IN",delta:diff,source:"驗票端微調",note:"票號:"+lastTicketId};statusEl.className="status wait";statusEl.textContent="🔄 同步中...";postFast(payload).then(res=>{statusEl.className="status ok";statusEl.innerHTML=`<div class="big" style="color:#2ecc71;">✅ 已修正 ${diff>0?'+':''}${diff}</div><div class="hr"></div><div class="big">📊 目前場內：${displayNumber(res.current)} 人</div>`}).catch(()=>{saveOffline({kind:"adjust",payload,createdAt:Date.now(),ticketId:lastTicketId});renderOfflineSaved(`🔧 已離線暫存修正 ${diff>0?'+':''}${diff}`,lastTicketId)})}
+function postFast(payload){return fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},cache:"no-store",keepalive:true,body:JSON.stringify(payload)}).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json()})}
+function loadQueue(){try{return JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]")}catch(e){return[]}}
+function saveQueue(queue){localStorage.setItem(QUEUE_KEY,JSON.stringify(queue));updateNetUI()}
+function saveOffline(item){const queue=loadQueue();queue.push({...item,queueId:String(Date.now())+Math.random().toString(16).slice(2),tries:0});saveQueue(queue)}
+function renderOfflineSaved(title,ticketId){statusEl.className="status offsave";statusEl.innerHTML=`<div class="big">${title}</div><div class="hr"></div><div>網路恢復後會自動補送</div>${ticketId?`<div class="queue-list">票號：${escapeHtml(ticketId)}</div>`:""}<div class="queue-list">目前待同步：${loadQueue().length} 筆</div>`}
+async function flushQueue(){if(syncing||!navigator.onLine)return;let queue=loadQueue();if(queue.length===0){updateNetUI();return}syncing=true;updateNetUI("同步中...");const remain=[];for(const item of queue){try{await postFast(item.payload)}catch(e){item.tries=(item.tries||0)+1;remain.push(item)}}syncing=false;saveQueue(remain);if(queue.length>remain.length){statusEl.className=remain.length?"status offsave":"status ok";statusEl.innerHTML=remain.length?`<div class="big">⚠️ 部分資料已同步</div><div class="queue-list">尚待同步：${remain.length} 筆</div>`:`<div class="big" style="color:#2ecc71;">✅ 離線資料已全部同步</div>`}}
+function updateNetUI(extraText){const queue=loadQueue();const online=navigator.onLine;netbar.classList.toggle("offline",!online||queue.length>0);netStatus.innerHTML=`<span class="dot"></span><span>${extraText||(online?"連線正常":"離線模式")}</span>`;queueCount.textContent=`待同步 ${queue.length} 筆`}
+function escapeHtml(value){return String(value).replace(/[&<>'"]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[s]))}
 </script>
-
 </body>
 </html>

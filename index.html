@@ -20,7 +20,6 @@
   <div id="netbar" class="netbar"><span id="netStatus" class="pill"><span class="dot"></span><span>連線正常</span></span><span id="queueCount">待同步 0 筆</span></div>
   <button id="start" class="start-btn">📷 啟動掃描驗票</button>
   <div class="scan-wrap"><div id="reader"></div><div class="scan-line" aria-hidden="true"></div></div>
-  <button id="startBackup" class="start-btn secondary">📷 啟動掃描</button>
   <div class="manual-box"><input type="text" id="manualTicketInput" placeholder="請手動輸入票號" autocomplete="off" inputmode="text"><button id="manualSubmitBtn" class="btn-send btn-manual">🎫 驗票</button></div>
   <div id="status" class="status">👋 請先按「啟動掃描驗票」，或手動輸入票號</div>
   <div id="adjustArea"><div class="adj-title">🔧 進園人數微調</div><div class="adj-grid"><button class="btn-adj minus" onclick="adjust(-1)">➖ 1</button><button class="btn-adj plus" onclick="adjust(1)">➕ 1</button><button class="btn-adj minus" onclick="adjust(-5)">➖ 5</button><button class="btn-adj plus" onclick="adjust(5)">➕ 5</button></div><div class="input-group"><input type="number" id="manualDiff" placeholder="輸入數字"><button class="btn-send" onclick="handleManualAdjust()">📤 送出</button></div></div>

@@ -1,0 +1,76 @@
+name: Patch Stitch text color
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-stitch-text.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch Stitch theme text colors
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          marker = '/* STITCH BLACK TEXT PATCH */'
+          patch = '''
+          /* STITCH BLACK TEXT PATCH */
+          body[data-theme="stitch"]{--text:#111827;--muted:#374151}
+          body[data-theme="stitch"],
+          body[data-theme="stitch"] button,
+          body[data-theme="stitch"] input,
+          body[data-theme="stitch"] .box,
+          body[data-theme="stitch"] .title,
+          body[data-theme="stitch"] .note,
+          body[data-theme="stitch"] .time,
+          body[data-theme="stitch"] .status,
+          body[data-theme="stitch"] .rec,
+          body[data-theme="stitch"] .rec b,
+          body[data-theme="stitch"] .rec small,
+          body[data-theme="stitch"] .tile,
+          body[data-theme="stitch"] .tile span,
+          body[data-theme="stitch"] .tile b,
+          body[data-theme="stitch"] .tile small,
+          body[data-theme="stitch"] #choice,
+          body[data-theme="stitch"] .clear,
+          body[data-theme="stitch"] .themeBtn{color:#111827!important}
+          body[data-theme="stitch"] .eyebrow,
+          body[data-theme="stitch"] .sub,
+          body[data-theme="stitch"] .note,
+          body[data-theme="stitch"] .time,
+          body[data-theme="stitch"] input::placeholder,
+          body[data-theme="stitch"] .rec small{color:#374151!important}
+          body[data-theme="stitch"] input{background:rgba(255,255,255,.72)!important;border-color:rgba(17,24,39,.22)!important}
+          body[data-theme="stitch"] .box,
+          body[data-theme="stitch"] .tile,
+          body[data-theme="stitch"] .rec,
+          body[data-theme="stitch"] #choice{border-color:rgba(17,24,39,.18)}
+          '''
+
+          if marker not in text:
+              text = text.replace('</style>', patch + '</style>', 1)
+          else:
+              start = text.index(marker)
+              end = text.index('</style>', start)
+              text = text[:start] + patch + text[end:]
+
+          path.write_text(text, encoding='utf-8')
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "史迪奇主題改為黑字"
+          git push

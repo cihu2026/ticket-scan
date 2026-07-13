@@ -1,4 +1,4 @@
-name: Patch Stitch text color
+name: Patch ticket scan appearance
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Patch Stitch theme text colors
+      - name: Apply Iansui font and Stitch black text
         shell: python
         run: |
           from pathlib import Path
@@ -23,9 +23,14 @@ jobs:
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
-          marker = '/* STITCH BLACK TEXT PATCH */'
+          marker = '/* TICKET SCAN APPEARANCE PATCH */'
           patch = '''
-          /* STITCH BLACK TEXT PATCH */
+          /* TICKET SCAN APPEARANCE PATCH */
+          @import url('https://fonts.googleapis.com/css2?family=Iansui&display=swap');
+          *,*::before,*::after,html,body,button,input,select,textarea{
+            font-family:"Iansui",sans-serif!important;
+            font-synthesis:none!important;
+          }
           body[data-theme="stitch"]{--text:#111827;--muted:#374151}
           body[data-theme="stitch"],
           body[data-theme="stitch"] button,
@@ -58,12 +63,17 @@ jobs:
           body[data-theme="stitch"] #choice{border-color:rgba(17,24,39,.18)}
           '''
 
-          if marker not in text:
-              text = text.replace('</style>', patch + '</style>', 1)
-          else:
+          old_marker = '/* STITCH BLACK TEXT PATCH */'
+          if marker in text:
               start = text.index(marker)
               end = text.index('</style>', start)
               text = text[:start] + patch + text[end:]
+          elif old_marker in text:
+              start = text.index(old_marker)
+              end = text.index('</style>', start)
+              text = text[:start] + patch + text[end:]
+          else:
+              text = text.replace('</style>', patch + '</style>', 1)
 
           path.write_text(text, encoding='utf-8')
 
@@ -72,5 +82,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --cached --quiet || git commit -m "史迪奇主題改為黑字"
+          git diff --cached --quiet || git commit -m "驗票系統全部改用芫荽字體"
           git push

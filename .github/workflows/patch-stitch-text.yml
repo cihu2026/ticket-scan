@@ -1,4 +1,4 @@
-name: Patch ticket scan appearance
+name: Patch theme text colors
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Apply Iansui font and Stitch black text
+      - name: Patch theme text colors only
         shell: python
         run: |
           from pathlib import Path
@@ -23,53 +23,45 @@ jobs:
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
-          marker = '/* TICKET SCAN APPEARANCE PATCH */'
-          patch = '''
-          /* TICKET SCAN APPEARANCE PATCH */
-          @import url('https://fonts.googleapis.com/css2?family=Iansui&display=swap');
-          *,*::before,*::after,html,body,button,input,select,textarea{
-            font-family:"Iansui",sans-serif!important;
-            font-synthesis:none!important;
-          }
-          body[data-theme="stitch"]{--text:#111827;--muted:#374151}
-          body[data-theme="stitch"],
-          body[data-theme="stitch"] button,
-          body[data-theme="stitch"] input,
-          body[data-theme="stitch"] .box,
-          body[data-theme="stitch"] .title,
-          body[data-theme="stitch"] .note,
-          body[data-theme="stitch"] .time,
-          body[data-theme="stitch"] .status,
-          body[data-theme="stitch"] .rec,
-          body[data-theme="stitch"] .rec b,
-          body[data-theme="stitch"] .rec small,
-          body[data-theme="stitch"] .tile,
-          body[data-theme="stitch"] .tile span,
-          body[data-theme="stitch"] .tile b,
-          body[data-theme="stitch"] .tile small,
-          body[data-theme="stitch"] #choice,
-          body[data-theme="stitch"] .clear,
-          body[data-theme="stitch"] .themeBtn{color:#111827!important}
-          body[data-theme="stitch"] .eyebrow,
-          body[data-theme="stitch"] .sub,
-          body[data-theme="stitch"] .note,
-          body[data-theme="stitch"] .time,
-          body[data-theme="stitch"] input::placeholder,
-          body[data-theme="stitch"] .rec small{color:#374151!important}
-          body[data-theme="stitch"] input{background:rgba(255,255,255,.72)!important;border-color:rgba(17,24,39,.22)!important}
-          body[data-theme="stitch"] .box,
-          body[data-theme="stitch"] .tile,
-          body[data-theme="stitch"] .rec,
-          body[data-theme="stitch"] #choice{border-color:rgba(17,24,39,.18)}
+          marker = '/* THEME DARK TEXT PATCH */'
+          patch = r'''
+          /* THEME DARK TEXT PATCH */
+          body{--themeText:#171a3d;--themeMuted:#3f456e}
+          body[data-theme="stitch"]{--themeText:#10233f;--themeMuted:#334e68}
+          body[data-theme="labubu"]{--themeText:#3f291e;--themeMuted:#664735}
+          body[data-theme="usagi"]{--themeText:#4b2142;--themeMuted:#704266}
+          body[data-theme="snoopy"]{--themeText:#172033;--themeMuted:#3f4d63}
+
+          body,
+          body h1,
+          body button,
+          body input,
+          body .box,
+          body .title,
+          body .status,
+          body .rec,
+          body .rec b,
+          body .tile,
+          body .tile b,
+          body #choice,
+          body .clear,
+          body .themeBtn,
+          body .countHead b,
+          body .historyHead,
+          body .head{color:var(--themeText)!important}
+
+          body .eyebrow,
+          body .sub,
+          body .note,
+          body .time,
+          body .tile span,
+          body .tile small,
+          body .rec small,
+          body input::placeholder{color:var(--themeMuted)!important}
           '''
 
-          old_marker = '/* STITCH BLACK TEXT PATCH */'
           if marker in text:
               start = text.index(marker)
-              end = text.index('</style>', start)
-              text = text[:start] + patch + text[end:]
-          elif old_marker in text:
-              start = text.index(old_marker)
               end = text.index('</style>', start)
               text = text[:start] + patch + text[end:]
           else:
@@ -82,5 +74,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --cached --quiet || git commit -m "驗票系統全部改用芫荽字體"
+          git diff --cached --quiet || git commit -m "各主題改用對應深色文字"
           git push
